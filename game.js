@@ -9,7 +9,9 @@ const player = {
     speed: 5,
     jumpForce: 15,
     velocityY: 0,
-    isJumping: false
+    isJumping: false,
+    moveLeft: false,
+    moveRight: false
 };
 
 const platforms = [];
@@ -65,6 +67,14 @@ function update() {
     // Apply gravity
     player.velocityY += 0.8;
     player.y += player.velocityY;
+
+    // Handle player movement
+    if (player.moveLeft) {
+        player.x -= player.speed;
+    }
+    if (player.moveRight) {
+        player.x += player.speed;
+    }
 
     // Check for collision with platforms
     platforms.forEach(platform => {
@@ -170,14 +180,22 @@ function gameLoop() {
 
 document.addEventListener('keydown', (event) => {
     if (event.code === 'ArrowLeft') {
-        player.x -= player.speed;
+        player.moveLeft = true;
     } else if (event.code === 'ArrowRight') {
-        player.x += player.speed;
+        player.moveRight = true;
     } else if (event.code === 'Space') {
         if (!player.isJumping) {
             player.velocityY = -player.jumpForce;
             player.isJumping = true;
         }
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    if (event.code === 'ArrowLeft') {
+        player.moveLeft = false;
+    } else if (event.code === 'ArrowRight') {
+        player.moveRight = false;
     }
 });
 
