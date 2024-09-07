@@ -86,7 +86,11 @@ function update() {
         score++;
         
         // Remove off-screen platforms and add new ones
-        platforms = platforms.filter(platform => platform.y < canvas.height);
+        for (let i = platforms.length - 1; i >= 0; i--) {
+            if (platforms[i].y >= canvas.height) {
+                platforms.splice(i, 1);
+            }
+        }
         while (platforms.length < 5) {
             platforms.push(generatePlatform(0));
         }
