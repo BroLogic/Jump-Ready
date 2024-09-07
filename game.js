@@ -34,8 +34,8 @@ function generatePlatform(y) {
 
 function generateCoin(platform) {
     return {
-        x: platform.x + Math.random() * (platform.width - 10),
-        y: platform.y - 40, // Further increased distance from platform
+        x: platform.x + platform.width / 2 - 5, // Center the coin above the platform
+        y: platform.y - 40, // Keep the same vertical distance from the platform
         width: 10,
         height: 10,
         collected: false
