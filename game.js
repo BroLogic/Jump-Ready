@@ -18,16 +18,16 @@ let highScore = 0;
 
 function generatePlatform(y) {
     return {
-        x: Math.random() * (canvas.width - 70),
+        x: Math.random() * (canvas.width - 100),
         y: y,
-        width: 70,
+        width: 100,
         height: 20
     };
 }
 
 // Generate initial platforms
-for (let i = 0; i < 5; i++) {
-    platforms.push(generatePlatform(i * 120));
+for (let i = 0; i < 7; i++) {
+    platforms.push(generatePlatform(i * 100));
 }
 
 function drawPlayer() {
@@ -91,8 +91,15 @@ function update() {
                 platforms.splice(i, 1);
             }
         }
-        while (platforms.length < 5) {
+        while (platforms.length < 7) {
             platforms.push(generatePlatform(0));
+        }
+    }
+
+    // Ensure platforms are not too close to each other
+    for (let i = 1; i < platforms.length; i++) {
+        if (platforms[i].y - platforms[i-1].y < 80) {
+            platforms[i].y = platforms[i-1].y + 80;
         }
     }
 
@@ -115,12 +122,12 @@ function update() {
 
 function resetGame() {
     platforms.length = 0;
-    for (let i = 0; i < 5; i++) {
-        platforms.push(generatePlatform(i * 120));
+    for (let i = 0; i < 7; i++) {
+        platforms.push(generatePlatform(i * 100));
     }
     
     // Place the player on the middle platform
-    const middlePlatform = platforms[2];
+    const middlePlatform = platforms[3];
     player.x = middlePlatform.x + middlePlatform.width / 2 - player.width / 2;
     player.y = middlePlatform.y - player.height;
     player.velocityY = 0;
