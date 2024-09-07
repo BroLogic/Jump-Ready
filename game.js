@@ -68,14 +68,30 @@ function update() {
 
     // Check for collision with platforms
     platforms.forEach(platform => {
-        if (player.y + player.height > platform.y &&
-            player.y + player.height < platform.y + platform.height &&
-            player.x < platform.x + platform.width &&
+        if (player.x < platform.x + platform.width &&
             player.x + player.width > platform.x &&
-            player.velocityY > 0) {
-            player.isJumping = false;
-            player.y = platform.y - player.height;
-            player.velocityY = 0;
+            player.y < platform.y + platform.height &&
+            player.y + player.height > platform.y) {
+            
+            // Collision from above
+            if (player.velocityY > 0 && player.y + player.height - player.velocityY <= platform.y) {
+                player.isJumping = false;
+                player.y = platform.y - player.height;
+                player.velocityY = 0;
+            }
+            // Collision from below
+            else if (player.velocityY < 0 && player.y - player.velocityY >= platform.y + platform.height) {
+                player.y = platform.y + platform.height;
+                player.velocityY = 0;
+            }
+            // Collision from the side
+            else {
+                if (player.x + player.width / 2 < platform.x + platform.width / 2) {
+                    player.x = platform.x - player.width;
+                } else {
+                    player.x = platform.x + platform.width;
+                }
+            }
         }
     });
 
