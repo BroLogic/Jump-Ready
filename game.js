@@ -16,7 +16,8 @@ const player = {
 
 let platforms = [];
 let score = 0;
-let highScore = 0;
+let highScore = localStorage.getItem('highScore') || 0;
+highScore = parseInt(highScore, 10);
 
 function generatePlatform(y) {
     const minWidth = Math.max(30, 100 - score / 100); // Platform width decreases as score increases
@@ -134,6 +135,7 @@ function update() {
     if (player.y > canvas.height) {
         if (score > highScore) {
             highScore = score;
+            localStorage.setItem('highScore', highScore);
         }
         alert(`Game Over! Your score: ${score}\nHigh Score: ${highScore}`);
         resetGame();
@@ -160,6 +162,7 @@ function resetGame() {
     player.y = lowestPlatform.y - player.height;
     player.velocityY = 0;
     score = 0;
+    // We don't reset highScore here anymore
 }
 
 function drawBackground() {
