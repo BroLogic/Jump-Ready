@@ -30,8 +30,9 @@ function generatePlatform(y) {
 }
 
 // Generate initial platforms
+const startY = canvas.height - 200; // Start generating platforms from this y-coordinate
 for (let i = 0; i < 7; i++) {
-    platforms.push(generatePlatform(i * 100));
+    platforms.push(generatePlatform(startY - i * 100));
 }
 
 function drawPlayer() {
@@ -148,8 +149,9 @@ function update() {
 
 function resetGame() {
     platforms.length = 0;
+    const startY = canvas.height - 200; // Start generating platforms from this y-coordinate
     for (let i = 0; i < 7; i++) {
-        platforms.push(generatePlatform(canvas.height - i * 100));
+        platforms.push(generatePlatform(startY - i * 100));
     }
     
     // Place the player on the lowest platform
