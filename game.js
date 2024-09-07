@@ -34,10 +34,10 @@ function generatePlatform(y) {
 
 function generateCoin(platform) {
     return {
-        x: platform.x + platform.width / 2 - 5, // Center the coin above the platform
-        y: platform.y - player.height - 5, // Place the coin one player height above the platform, with a small gap
-        width: 10,
-        height: 10,
+        x: platform.x + platform.width / 2 - 10, // Center the coin above the platform
+        y: platform.y - player.height - 20, // Place the coin one player height above the platform, with a larger gap
+        width: 20,
+        height: 20,
         collected: false
     };
 }
@@ -109,7 +109,7 @@ function drawCoins() {
 
             // '?' symbol
             ctx.fillStyle = '#FFD700';
-            ctx.font = `bold ${radius}px Arial`;
+            ctx.font = `bold ${radius * 1.2}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('?', centerX, centerY);
