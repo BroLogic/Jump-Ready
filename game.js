@@ -3,11 +3,11 @@ const ctx = canvas.getContext('2d');
 
 const player = {
     x: 200,
-    y: 300,  // Changed from 550 to 300
+    y: 300,
     width: 30,
     height: 30,
     speed: 5,
-    jumpForce: 15,
+    jumpForce: 17,  // Increased jump force
     velocityY: 0,
     isJumping: false,
     moveLeft: false,
@@ -35,7 +35,7 @@ function generatePlatform(y) {
 function generateCoin(platform) {
     return {
         x: platform.x + Math.random() * (platform.width - 10),
-        y: platform.y - 25, // Increased distance from platform
+        y: platform.y - 40, // Further increased distance from platform
         width: 10,
         height: 10,
         collected: false
@@ -156,7 +156,10 @@ function update() {
             const highestPlatform = platforms.reduce((prev, current) => 
                 (prev.y < current.y) ? prev : current
             );
-            const newPlatform = generatePlatform(highestPlatform.y - Math.random() * 50 - 50);
+            const minDistance = 80; // Minimum vertical distance between platforms
+            const maxDistance = 150; // Maximum vertical distance between platforms
+            const newPlatformY = highestPlatform.y - minDistance - Math.random() * (maxDistance - minDistance);
+            const newPlatform = generatePlatform(newPlatformY);
             platforms.push(newPlatform);
             if (Math.random() < 0.7) { // 70% chance to spawn a coin on a platform
                 coins.push(generateCoin(newPlatform));
