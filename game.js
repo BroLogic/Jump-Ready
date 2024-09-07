@@ -14,7 +14,7 @@ const player = {
     moveRight: false
 };
 
-const platforms = [];
+let platforms = [];
 let score = 0;
 let highScore = 0;
 
@@ -114,7 +114,7 @@ function update() {
         });
         score += Math.floor(moveDistance);
     
-        // Remove off-screen platforms
+        // Remove off-screen platforms and add new ones
         platforms = platforms.filter(platform => platform.y < canvas.height);
 
         // Add new platforms
