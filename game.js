@@ -15,7 +15,9 @@ const player = {
 };
 
 let platforms = [];
+let coins = [];
 let score = 0;
+let coinCount = 0;
 let highScore = localStorage.getItem('highScore') || 0;
 highScore = parseInt(highScore, 10);
 
@@ -30,10 +32,24 @@ function generatePlatform(y) {
     };
 }
 
-// Generate initial platforms
+function generateCoin(platform) {
+    return {
+        x: platform.x + Math.random() * (platform.width - 10),
+        y: platform.y - 15,
+        width: 10,
+        height: 10,
+        collected: false
+    };
+}
+
+// Generate initial platforms and coins
 const startY = canvas.height - 200; // Start generating platforms from this y-coordinate
 for (let i = 0; i < 7; i++) {
-    platforms.push(generatePlatform(startY - i * 100));
+    const platform = generatePlatform(startY - i * 100);
+    platforms.push(platform);
+    if (Math.random() < 0.7) { // 70% chance to spawn a coin on a platform
+        coins.push(generateCoin(platform));
+    }
 }
 
 function drawPlayer() {
@@ -63,6 +79,18 @@ function drawScore() {
     ctx.font = '20px Arial';
     ctx.fillText(`Score: ${score}`, 10, 30);
     ctx.fillText(`High Score: ${highScore}`, 10, 60);
+    ctx.fillText(`Coins: ${coinCount}`, 10, 90);
+}
+
+function drawCoins() {
+    ctx.fillStyle = 'gold';
+    coins.forEach(coin => {
+        if (!coin.collected) {
+            ctx.beginPath();
+            ctx.arc(coin.x + coin.width / 2, coin.y + coin.height / 2, coin.width / 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    });
 }
 
 function update() {
@@ -107,26 +135,46 @@ function update() {
         }
     });
 
-    // Move platforms down and remove off-screen platforms
+    // Move platforms and coins down and remove off-screen ones
     if (player.y < 300) {
         const moveDistance = 300 - player.y;
         player.y = 300;
         platforms.forEach(platform => {
             platform.y += moveDistance;
         });
+        coins.forEach(coin => {
+            coin.y += moveDistance;
+        });
         score += Math.floor(moveDistance);
     
-        // Remove off-screen platforms and add new ones
+        // Remove off-screen platforms and coins, and add new ones
         platforms = platforms.filter(platform => platform.y < canvas.height);
+        coins = coins.filter(coin => coin.y < canvas.height);
 
-        // Add new platforms
+        // Add new platforms and coins
         while (platforms.length < 7 || platforms[platforms.length - 1].y > 0) {
             const highestPlatform = platforms.reduce((prev, current) => 
                 (prev.y < current.y) ? prev : current
             );
-            platforms.push(generatePlatform(highestPlatform.y - Math.random() * 50 - 50));
+            const newPlatform = generatePlatform(highestPlatform.y - Math.random() * 50 - 50);
+            platforms.push(newPlatform);
+            if (Math.random() < 0.7) { // 70% chance to spawn a coin on a platform
+                coins.push(generateCoin(newPlatform));
+            }
         }
     }
+
+    // Check for coin collection
+    coins.forEach(coin => {
+        if (!coin.collected &&
+            player.x < coin.x + coin.width &&
+            player.x + player.width > coin.x &&
+            player.y < coin.y + coin.height &&
+            player.y + player.height > coin.y) {
+            coin.collected = true;
+            coinCount++;
+        }
+    });
 
     // Sort platforms by y-coordinate (highest to lowest)
     platforms.sort((a, b) => a.y - b.y);
@@ -181,6 +229,7 @@ function gameLoop() {
     drawBackground();
     update();
     drawPlatforms();
+    drawCoins();
     drawPlayer();
     drawScore();
     requestAnimationFrame(gameLoop);
