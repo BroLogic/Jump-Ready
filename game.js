@@ -173,9 +173,11 @@ document.addEventListener('keydown', (event) => {
         player.x -= player.speed;
     } else if (event.code === 'ArrowRight') {
         player.x += player.speed;
-    } else if (event.code === 'Space' && !player.isJumping) {
-        player.velocityY = -player.jumpForce;
-        player.isJumping = true;
+    } else if (event.code === 'Space') {
+        if (!player.isJumping) {
+            player.velocityY = -player.jumpForce;
+            player.isJumping = true;
+        }
     }
 });
 
