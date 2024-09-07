@@ -83,12 +83,36 @@ function drawScore() {
 }
 
 function drawCoins() {
-    ctx.fillStyle = 'gold';
     coins.forEach(coin => {
         if (!coin.collected) {
+            const centerX = coin.x + coin.width / 2;
+            const centerY = coin.y + coin.height / 2;
+            const radius = coin.width / 2;
+
+            // Outer circle (gold rim)
             ctx.beginPath();
-            ctx.arc(coin.x + coin.width / 2, coin.y + coin.height / 2, coin.width / 2, 0, Math.PI * 2);
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD700';
             ctx.fill();
+
+            // Inner circle (lighter gold)
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.8, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFDF00';
+            ctx.fill();
+
+            // Highlight
+            ctx.beginPath();
+            ctx.arc(centerX - radius * 0.2, centerY - radius * 0.2, radius * 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFF68F';
+            ctx.fill();
+
+            // '?' symbol
+            ctx.fillStyle = '#FFD700';
+            ctx.font = `bold ${radius}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('?', centerX, centerY);
         }
     });
 }
