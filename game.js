@@ -3,7 +3,7 @@ const ctx = canvas.getContext('2d');
 
 const player = {
     x: 200,
-    y: 550,
+    y: 300,  // Changed from 550 to 300
     width: 30,
     height: 30,
     speed: 5,
@@ -110,13 +110,16 @@ function update() {
 }
 
 function resetGame() {
-    player.x = 200;
-    player.y = 550;
-    player.velocityY = 0;
     platforms.length = 0;
     for (let i = 0; i < 5; i++) {
         platforms.push(generatePlatform(i * 120));
     }
+    
+    // Place the player on the middle platform
+    const middlePlatform = platforms[2];
+    player.x = middlePlatform.x + middlePlatform.width / 2 - player.width / 2;
+    player.y = middlePlatform.y - player.height;
+    player.velocityY = 0;
     score = 0;
 }
 
@@ -149,4 +152,5 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+resetGame();
 gameLoop();
