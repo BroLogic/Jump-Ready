@@ -35,7 +35,7 @@ function generatePlatform(y) {
 function generateCoin(platform) {
     return {
         x: platform.x + platform.width / 2 - 5, // Center the coin above the platform
-        y: platform.y - 25, // Place the coin just a little bit above the platform
+        y: platform.y - player.height - 5, // Place the coin one player height above the platform, with a small gap
         width: 10,
         height: 10,
         collected: false
