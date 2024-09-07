@@ -161,6 +161,9 @@ function resetGame() {
     player.x = lowestPlatform.x + lowestPlatform.width / 2 - player.width / 2;
     player.y = lowestPlatform.y - player.height;
     player.velocityY = 0;
+    player.moveLeft = false;
+    player.moveRight = false;
+    player.isJumping = false;
     score = 0;
     // We don't reset highScore here anymore
 }
