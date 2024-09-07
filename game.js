@@ -17,10 +17,12 @@ let score = 0;
 let highScore = 0;
 
 function generatePlatform(y) {
+    const minWidth = Math.max(30, 100 - score / 100); // Platform width decreases as score increases
+    const width = minWidth + Math.random() * (100 - minWidth);
     return {
-        x: Math.random() * (canvas.width - 100),
+        x: Math.random() * (canvas.width - width),
         y: y,
-        width: 100,
+        width: width,
         height: 20
     };
 }
@@ -79,29 +81,27 @@ function update() {
 
     // Move platforms down and remove off-screen platforms
     if (player.y < 300) {
-        player.y += 2;
+        const moveDistance = 300 - player.y;
+        player.y = 300;
         platforms.forEach(platform => {
-            platform.y += 2;
+            platform.y += moveDistance;
         });
-        score++;
-        
-        // Remove off-screen platforms and add new ones
-        for (let i = platforms.length - 1; i >= 0; i--) {
-            if (platforms[i].y >= canvas.height) {
-                platforms.splice(i, 1);
-            }
-        }
-        while (platforms.length < 7) {
-            platforms.push(generatePlatform(0));
+        score += Math.floor(moveDistance);
+    
+        // Remove off-screen platforms
+        platforms = platforms.filter(platform => platform.y < canvas.height);
+
+        // Add new platforms
+        while (platforms.length < 7 || platforms[platforms.length - 1].y > 0) {
+            const highestPlatform = platforms.reduce((prev, current) => 
+                (prev.y < current.y) ? prev : current
+            );
+            platforms.push(generatePlatform(highestPlatform.y - Math.random() * 50 - 50));
         }
     }
 
-    // Ensure platforms are not too close to each other
-    for (let i = 1; i < platforms.length; i++) {
-        if (platforms[i].y - platforms[i-1].y < 80) {
-            platforms[i].y = platforms[i-1].y + 80;
-        }
-    }
+    // Sort platforms by y-coordinate (highest to lowest)
+    platforms.sort((a, b) => a.y - b.y);
 
     // Game over if player falls off screen
     if (player.y > canvas.height) {
@@ -123,13 +123,13 @@ function update() {
 function resetGame() {
     platforms.length = 0;
     for (let i = 0; i < 7; i++) {
-        platforms.push(generatePlatform(i * 100));
+        platforms.push(generatePlatform(canvas.height - i * 100));
     }
     
-    // Place the player on the middle platform
-    const middlePlatform = platforms[3];
-    player.x = middlePlatform.x + middlePlatform.width / 2 - player.width / 2;
-    player.y = middlePlatform.y - player.height;
+    // Place the player on the lowest platform
+    const lowestPlatform = platforms[0];
+    player.x = lowestPlatform.x + lowestPlatform.width / 2 - player.width / 2;
+    player.y = lowestPlatform.y - player.height;
     player.velocityY = 0;
     score = 0;
 }
