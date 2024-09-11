@@ -77,9 +77,9 @@ function drawPlatforms() {
 function drawScore() {
     ctx.fillStyle = 'black';
     ctx.font = '20px Arial';
-    ctx.fillText(`Score: ${score}`, 20, 40);
-    ctx.fillText(`High Score: ${highScore}`, 20, 70);
-    ctx.fillText(`Coins: ${coinCount}`, 20, 100);
+    ctx.fillText(`Score: ${score}`, 10, 30);
+    ctx.fillText(`High Score: ${highScore}`, 10, 60);
+    ctx.fillText(`Coins: ${coinCount}`, 10, 90);
 }
 
 function drawCoins() {
