@@ -212,7 +212,6 @@ function update() {
             highScore = score;
             localStorage.setItem('highScore', highScore);
         }
-        alert(`Game Over! Your score: ${score}\nHigh Score: ${highScore}`);
         resetGame();
     }
 
