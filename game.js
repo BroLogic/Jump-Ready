@@ -27,7 +27,10 @@ function generatePlatform(y) {
         x: Math.random() * (canvas.width - width),
         y: y,
         width: width,
-        height: 20
+        height: 20,
+        isMoving: Math.random() < 0.25, // 25% chance for a platform to be moving
+        direction: 1, // 1 for right, -1 for left
+        speed: 1 + Math.random() * 2 // Random speed between 1 and 3
     };
 }
 
@@ -129,8 +132,16 @@ function update() {
         player.x += player.speed;
     }
 
-    // Check for collision with platforms
+    // Update and check for collision with platforms
     platforms.forEach(platform => {
+        // Move platform if it's a moving platform
+        if (platform.isMoving) {
+            platform.x += platform.direction * platform.speed;
+            if (platform.x <= 0 || platform.x + platform.width >= canvas.width) {
+                platform.direction *= -1; // Reverse direction when hitting the edge
+            }
+        }
+
         if (player.x < platform.x + platform.width &&
             player.x + player.width > platform.x &&
             player.y < platform.y + platform.height &&
@@ -141,6 +152,11 @@ function update() {
                 player.isJumping = false;
                 player.y = platform.y - player.height;
                 player.velocityY = 0;
+                
+                // Move player with the platform if it's moving
+                if (platform.isMoving) {
+                    player.x += platform.direction * platform.speed;
+                }
             }
             // Collision from below
             else if (player.velocityY < 0 && player.y - player.velocityY >= platform.y + platform.height) {
