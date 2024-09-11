@@ -20,7 +20,7 @@ let score = 0;
 let coinCount = parseInt(localStorage.getItem('coinCount') || 0, 10);
 let highScore = parseInt(localStorage.getItem('highScore') || 0, 10);
 
-function generatePlatform(y) {
+function generatePlatform(y, isStarting = false) {
     const minWidth = Math.max(30, 100 - score / 100); // Platform width decreases as score increases
     const width = minWidth + Math.random() * (100 - minWidth);
     return {
@@ -30,7 +30,10 @@ function generatePlatform(y) {
         height: 20,
         isMoving: Math.random() < 0.25, // 25% chance for a platform to be moving
         direction: 1, // 1 for right, -1 for left
-        speed: 1 + Math.random() * 2 // Random speed between 1 and 3
+        speed: 1 + Math.random() * 2, // Random speed between 1 and 3
+        isCrumbling: !isStarting && Math.random() < 0.25, // 25% chance for a platform to be crumbling, but not for the starting platform
+        crumbleTimer: 0,
+        color: '#2ecc71' // Default color
     };
 }
 
@@ -70,8 +73,8 @@ function drawPlayer() {
 }
 
 function drawPlatforms() {
-    ctx.fillStyle = '#2ecc71';
     platforms.forEach(platform => {
+        ctx.fillStyle = platform.isCrumbling ? '#8e44ad' : platform.color;
         ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
     });
 }
@@ -133,7 +136,7 @@ function update() {
     }
 
     // Update and check for collision with platforms
-    platforms.forEach(platform => {
+    platforms.forEach((platform, index) => {
         // Move platform if it's a moving platform
         if (platform.isMoving) {
             platform.x += platform.direction * platform.speed;
@@ -156,6 +159,14 @@ function update() {
                 // Move player with the platform if it's moving
                 if (platform.isMoving) {
                     player.x += platform.direction * platform.speed;
+                }
+
+                // Start crumbling timer if it's a crumbling platform
+                if (platform.isCrumbling) {
+                    platform.crumbleTimer++;
+                    if (platform.crumbleTimer > 60) { // 1 second at 60 FPS
+                        platforms.splice(index, 1); // Remove the platform
+                    }
                 }
             }
             // Collision from below
@@ -244,7 +255,7 @@ function resetGame() {
     coins.length = 0;
     const startY = canvas.height - 200; // Start generating platforms from this y-coordinate
     for (let i = 0; i < 7; i++) {
-        const platform = generatePlatform(startY - i * 100);
+        const platform = generatePlatform(startY - i * 100, i === 0); // The first platform (i === 0) is the starting platform
         platforms.push(platform);
         if (Math.random() < 0.7) { // 70% chance to spawn a coin on a platform
             coins.push(generateCoin(platform));
