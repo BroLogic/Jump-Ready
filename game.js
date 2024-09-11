@@ -17,9 +17,8 @@ const player = {
 let platforms = [];
 let coins = [];
 let score = 0;
-let coinCount = 0;
-let highScore = localStorage.getItem('highScore') || 0;
-highScore = parseInt(highScore, 10);
+let coinCount = parseInt(localStorage.getItem('coinCount') || 0, 10);
+let highScore = parseInt(localStorage.getItem('highScore') || 0, 10);
 
 function generatePlatform(y) {
     const minWidth = Math.max(30, 100 - score / 100); // Platform width decreases as score increases
@@ -200,6 +199,7 @@ function update() {
             player.y + player.height > coin.y) {
             coin.collected = true;
             coinCount++;
+            localStorage.setItem('coinCount', coinCount);
         }
     });
 
@@ -226,9 +226,14 @@ function update() {
 
 function resetGame() {
     platforms.length = 0;
+    coins.length = 0;
     const startY = canvas.height - 200; // Start generating platforms from this y-coordinate
     for (let i = 0; i < 7; i++) {
-        platforms.push(generatePlatform(startY - i * 100));
+        const platform = generatePlatform(startY - i * 100);
+        platforms.push(platform);
+        if (Math.random() < 0.7) { // 70% chance to spawn a coin on a platform
+            coins.push(generateCoin(platform));
+        }
     }
     
     // Place the player on the lowest platform
@@ -240,7 +245,7 @@ function resetGame() {
     player.moveRight = false;
     player.isJumping = false;
     score = 0;
-    // We don't reset highScore here anymore
+    // We don't reset highScore or coinCount here anymore
 }
 
 function drawBackground() {
