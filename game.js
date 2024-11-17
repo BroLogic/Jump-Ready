@@ -498,7 +498,7 @@ document.addEventListener('keydown', (event) => {
         player.moveLeft = true;
     } else if (event.code === 'ArrowRight' || event.code === 'KeyD') {
         player.moveRight = true;
-    } else if (event.code === 'Space') {
+    } else if (event.code === 'Space' || event.code === 'ArrowUp' || event.code === 'KeyW') {
         if (!player.isJumping) {
             player.velocityY = -player.jumpForce;
             player.isJumping = true;
