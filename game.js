@@ -349,20 +349,28 @@ function update() {
             platform.y = platform.baseY + Math.sin(Date.now() / 1000) * platform.verticalRange;
         }
 
+        // Get the effective y position for collision checking
+        const effectiveY = platform.isVertical ? 
+            platform.baseY + Math.sin(Date.now() / 1000) * platform.verticalRange : 
+            platform.y;
+
         if (player.x < platform.x + platform.width &&
             player.x + player.width > platform.x &&
-            player.y < platform.y + platform.height &&
-            player.y + player.height > platform.y) {
+            player.y < effectiveY + platform.height &&
+            player.y + player.height > effectiveY) {
             
             // Collision from above
-            if (player.velocityY > 0 && player.y + player.height - player.velocityY <= platform.y) {
+            if (player.velocityY > 0 && player.y + player.height - player.velocityY <= effectiveY) {
                 player.isJumping = false;
-                player.y = platform.y - player.height;
+                player.y = effectiveY - player.height;
                 player.velocityY = 0;
                 
-                // Move player with the platform if it's moving
+                // Move player with the platform if it's moving horizontally or vertically
                 if (platform.isMoving) {
                     player.x += platform.direction * platform.speed;
+                } else if (platform.isVertical) {
+                    // Add vertical movement to player when on vertical platform
+                    player.y = effectiveY - player.height;
                 }
 
                 // Handle crumbling and shortcut platforms
