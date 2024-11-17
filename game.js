@@ -14,7 +14,7 @@ const player = {
     moveRight: false,
     hasJetpack: false,
     jetpackTimer: 0,
-    jetpackDuration: 480 // 8 seconds at 60 FPS
+    jetpackDuration: 180 // 3 seconds at 60 FPS
 };
 
 let platforms = [];
