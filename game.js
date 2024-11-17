@@ -5,17 +5,35 @@ const ctx = canvas.getContext('2d');
 const revSound = document.getElementById('revSound');
 const jumpSound = document.getElementById('jumpSound');
 
+// Load sounds
+window.addEventListener('load', () => {
+    revSound.src = 'rev.mp3';
+    jumpSound.src = 'boing.mp3';
+});
+
 // Sound functions
 function playRevSound() {
     console.log("Playing rev sound");
-    revSound.currentTime = 0;
-    revSound.play().catch(error => console.error('Error playing rev sound:', error));
+    try {
+        if (revSound.readyState === 4) { // HAVE_ENOUGH_DATA
+            revSound.currentTime = 0;
+            revSound.play().catch(error => console.error('Error playing rev sound:', error));
+        }
+    } catch (error) {
+        console.error('Error playing rev sound:', error);
+    }
 }
 
 function playJumpSound() {
     console.log("Playing jump sound");
-    jumpSound.currentTime = 0;
-    jumpSound.play().catch(error => console.error('Error playing jump sound:', error));
+    try {
+        if (jumpSound.readyState === 4) { // HAVE_ENOUGH_DATA
+            jumpSound.currentTime = 0;
+            jumpSound.play().catch(error => console.error('Error playing jump sound:', error));
+        }
+    } catch (error) {
+        console.error('Error playing jump sound:', error);
+    }
 }
 
 const skins = {
