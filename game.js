@@ -396,6 +396,9 @@ function update() {
         player.y = 300;
         platforms.forEach(platform => {
             platform.y += moveDistance;
+            if (platform.isVertical) {
+                platform.baseY += moveDistance; // Move the base Y position for vertical platforms
+            }
         });
         coins.forEach(coin => {
             coin.y += moveDistance;
