@@ -126,17 +126,19 @@ function generateJetpack(platform) {
 function generatePlatform(y, isStarting = false) {
     const minWidth = Math.max(30, 100 - score / 100); // Platform width decreases as score increases
     const width = minWidth + Math.random() * (100 - minWidth);
+    const isShortcut = !isStarting && Math.random() < 0.1; // 10% chance for a shortcut platform
     return {
         x: Math.random() * (canvas.width - width),
         y: y,
         width: width,
         height: 20,
-        isMoving: Math.random() < 0.25, // 25% chance for a platform to be moving
+        isMoving: !isShortcut && Math.random() < 0.25, // 25% chance for a platform to be moving (not for shortcuts)
         direction: 1, // 1 for right, -1 for left
         speed: 1 + Math.random() * 2, // Random speed between 1 and 3
-        isCrumbling: !isStarting && Math.random() < 0.25, // 25% chance for a platform to be crumbling, but not for the starting platform
+        isCrumbling: !isStarting && !isShortcut && Math.random() < 0.25, // 25% chance for regular platforms to crumble
+        isShortcut: isShortcut, // Flag for shortcut platforms
         crumbleTimer: 0,
-        color: '#2ecc71' // Default color
+        color: isShortcut ? '#e74c3c' : '#2ecc71' // Red for shortcuts, green for regular
     };
 }
 
@@ -357,10 +359,11 @@ function update() {
                     player.x += platform.direction * platform.speed;
                 }
 
-                // Start crumbling timer if it's a crumbling platform
-                if (platform.isCrumbling) {
+                // Handle crumbling and shortcut platforms
+                if (platform.isCrumbling || platform.isShortcut) {
                     platform.crumbleTimer++;
-                    if (platform.crumbleTimer > 60) { // 1 second at 60 FPS
+                    const timeout = platform.isShortcut ? 60 : 60; // 1 second for both types
+                    if (platform.crumbleTimer > timeout) {
                         platforms.splice(index, 1); // Remove the platform
                     }
                 }
