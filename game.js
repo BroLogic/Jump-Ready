@@ -127,22 +127,18 @@ function generatePlatform(y, isStarting = false) {
     const minWidth = Math.max(30, 100 - score / 100); // Platform width decreases as score increases
     const width = minWidth + Math.random() * (100 - minWidth);
     const isShortcut = !isStarting && Math.random() < 0.1; // 10% chance for a shortcut platform
-    const isVertical = !isStarting && !isShortcut && Math.random() < 0.15; // 15% chance for vertical moving platform
     return {
         x: Math.random() * (canvas.width - width),
         y: y,
         width: width,
         height: 20,
-        isMoving: !isShortcut && !isVertical && Math.random() < 0.25, // 25% chance for horizontal movement
-        isVertical: isVertical, // Flag for vertical movement
+        isMoving: !isShortcut && Math.random() < 0.25, // 25% chance for horizontal movement
         direction: 1, // 1 for right/up, -1 for left/down
         speed: 1 + Math.random() * 2, // Random speed between 1 and 3
-        baseY: y, // Store original Y position for vertical movement
-        verticalRange: 100, // Range of vertical movement
-        isCrumbling: !isStarting && !isShortcut && !isVertical && Math.random() < 0.25, // 25% chance for regular platforms to crumble
+        isCrumbling: !isStarting && !isShortcut && Math.random() < 0.25, // 25% chance for regular platforms to crumble
         isShortcut: isShortcut, // Flag for shortcut platforms
         crumbleTimer: 0,
-        color: isShortcut ? '#e74c3c' : (isVertical ? '#3498db' : '#2ecc71') // Red for shortcuts, blue for vertical, green for regular
+        color: isShortcut ? '#e74c3c' : '#2ecc71' // Red for shortcuts, green for regular
     };
 }
 
@@ -345,34 +341,22 @@ function update() {
             if (platform.x <= 0 || platform.x + platform.width >= canvas.width) {
                 platform.direction *= -1; // Reverse direction when hitting the edge
             }
-        } else if (platform.isVertical) {
-            platform.y = platform.baseY + Math.sin(Date.now() / 1000) * platform.verticalRange;
         }
-
-        // Get the effective y position for collision checking
-        const effectiveY = platform.isVertical ? 
-            platform.baseY + Math.sin(Date.now() / 1000) * platform.verticalRange : 
-            platform.y;
 
         if (player.x < platform.x + platform.width &&
             player.x + player.width > platform.x &&
-            player.y < effectiveY + platform.height &&
-            player.y + player.height > effectiveY) {
+            player.y < platform.y + platform.height &&
+            player.y + player.height > platform.y) {
             
             // Collision from above
-            if (player.velocityY > 0 && player.y + player.height - player.velocityY <= effectiveY) {
+            if (player.velocityY > 0 && player.y + player.height - player.velocityY <= platform.y) {
                 player.isJumping = false;
-                player.y = effectiveY - player.height;
+                player.y = platform.y - player.height;
                 player.velocityY = 0;
                 
-                // Move player with the platform if it's moving horizontally or vertically
+                // Move player with the platform if it's moving horizontally
                 if (platform.isMoving) {
                     player.x += platform.direction * platform.speed;
-                } else if (platform.isVertical) {
-                    // Only adjust player position if they're about to lose contact with platform
-                    if (player.y > effectiveY - player.height + 5) {
-                        player.y = effectiveY - player.height;
-                    }
                 }
 
                 // Handle crumbling and shortcut platforms
@@ -406,9 +390,6 @@ function update() {
         player.y = 300;
         platforms.forEach(platform => {
             platform.y += moveDistance;
-            if (platform.isVertical) {
-                platform.baseY += moveDistance; // Move the base Y position for vertical platforms
-            }
         });
         coins.forEach(coin => {
             coin.y += moveDistance;
