@@ -294,9 +294,9 @@ function gameLoop() {
 }
 
 document.addEventListener('keydown', (event) => {
-    if (event.code === 'ArrowLeft') {
+    if (event.code === 'ArrowLeft' || event.code === 'KeyA') {
         player.moveLeft = true;
-    } else if (event.code === 'ArrowRight') {
+    } else if (event.code === 'ArrowRight' || event.code === 'KeyD') {
         player.moveRight = true;
     } else if (event.code === 'Space') {
         if (!player.isJumping) {
@@ -307,9 +307,9 @@ document.addEventListener('keydown', (event) => {
 });
 
 document.addEventListener('keyup', (event) => {
-    if (event.code === 'ArrowLeft') {
+    if (event.code === 'ArrowLeft' || event.code === 'KeyA') {
         player.moveLeft = false;
-    } else if (event.code === 'ArrowRight') {
+    } else if (event.code === 'ArrowRight' || event.code === 'KeyD') {
         player.moveRight = false;
     }
 });
