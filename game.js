@@ -1,6 +1,21 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Sound elements
+const revSound = document.getElementById('revSound');
+const jumpSound = document.getElementById('jumpSound');
+
+// Sound functions
+function playRevSound() {
+    revSound.currentTime = 0;
+    revSound.play();
+}
+
+function playJumpSound() {
+    jumpSound.currentTime = 0;
+    jumpSound.play();
+}
+
 const skins = {
     default: {
         name: 'Default',
@@ -401,6 +416,7 @@ function resetGame() {
     platforms.length = 0;
     coins.length = 0;
     jetpacks.length = 0;
+    playRevSound(); // Play rev sound when game starts/restarts
     const startY = canvas.height - 200; // Start generating platforms from this y-coordinate
     for (let i = 0; i < 7; i++) {
         const platform = generatePlatform(startY - i * 100, i === 0); // The first platform (i === 0) is the starting platform
@@ -620,6 +636,7 @@ document.addEventListener('keydown', (event) => {
         if (!player.isJumping) {
             player.velocityY = -player.jumpForce;
             player.isJumping = true;
+            playJumpSound(); // Play boing sound when jumping
         }
     }
 });
