@@ -282,9 +282,10 @@ const stars = Array(200).fill().map(() => ({
 }));
 
 const planets = [
-    { x: 50, baseY: -500, size: 40, color: '#FF6B6B' },  // Red planet
-    { x: 300, baseY: -1200, size: 60, color: '#4ECDC4' }, // Blue-green planet
-    { x: 150, baseY: -2000, size: 80, color: '#96CEB4' }  // Pale green planet
+    { x: 50, baseY: -500, size: 40, color: '#FF6B6B', hasRings: false, details: 3 },  // Red planet
+    { x: 300, baseY: -1200, size: 60, color: '#4ECDC4', hasRings: true, details: 2 }, // Saturn-like
+    { x: 150, baseY: -2000, size: 80, color: '#96CEB4', hasRings: false, details: 4 }, // Gas giant
+    { x: 250, baseY: -2800, size: 45, color: '#FFB347', hasRings: true, details: 2 }  // Orange ringed planet
 ];
 
 function drawStar(x, y, size) {
@@ -294,16 +295,53 @@ function drawStar(x, y, size) {
     ctx.fill();
 }
 
-function drawPlanet(x, y, size, color) {
+function drawPlanet(x, y, size, color, hasRings, details) {
+    // Main planet body
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fill();
     
-    // Add some surface detail
-    ctx.fillStyle = `${color}88`;
+    // Draw rings if the planet has them
+    if (hasRings) {
+        // Outer ring
+        ctx.beginPath();
+        ctx.ellipse(x, y, size * 1.8, size * 0.5, -Math.PI / 6, 0, Math.PI * 2);
+        ctx.strokeStyle = `${color}88`;
+        ctx.lineWidth = size * 0.2;
+        ctx.stroke();
+        
+        // Inner ring
+        ctx.beginPath();
+        ctx.ellipse(x, y, size * 1.5, size * 0.4, -Math.PI / 6, 0, Math.PI * 2);
+        ctx.strokeStyle = `${color}AA`;
+        ctx.lineWidth = size * 0.15;
+        ctx.stroke();
+    }
+    
+    // Surface details
+    for (let i = 0; i < details; i++) {
+        const angle = (Math.PI * 2 * i) / details;
+        const detailX = x + Math.cos(angle) * (size * 0.4);
+        const detailY = y + Math.sin(angle) * (size * 0.4);
+        const detailSize = size * (0.2 + Math.random() * 0.3);
+        
+        ctx.fillStyle = `${color}88`;
+        ctx.beginPath();
+        ctx.arc(detailX, detailY, detailSize, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    // Highlight effect
+    const gradient = ctx.createRadialGradient(
+        x - size * 0.3, y - size * 0.3, size * 0.1,
+        x, y, size
+    );
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = gradient;
     ctx.beginPath();
-    ctx.arc(x - size/3, y - size/3, size/2, 0, Math.PI * 2);
+    ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fill();
 }
 
@@ -351,7 +389,7 @@ function drawBackground() {
     planets.forEach(planet => {
         const adjustedY = planet.baseY + (score/2) % 3000;
         if (adjustedY > -100 && adjustedY < canvas.height + 100) {
-            drawPlanet(planet.x, adjustedY, planet.size, planet.color);
+            drawPlanet(planet.x, adjustedY, planet.size, planet.color, planet.hasRings, planet.details);
         }
     });
     
