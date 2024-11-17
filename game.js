@@ -274,12 +274,90 @@ function resetGame() {
     // We don't reset highScore or coinCount here anymore
 }
 
+// Store stars and planets as global variables
+const stars = Array(200).fill().map(() => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height * 3, // Extended height for scrolling
+    size: Math.random() * 2 + 1
+}));
+
+const planets = [
+    { x: 50, baseY: -500, size: 40, color: '#FF6B6B' },  // Red planet
+    { x: 300, baseY: -1200, size: 60, color: '#4ECDC4' }, // Blue-green planet
+    { x: 150, baseY: -2000, size: 80, color: '#96CEB4' }  // Pale green planet
+];
+
+function drawStar(x, y, size) {
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawPlanet(x, y, size, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Add some surface detail
+    ctx.fillStyle = `${color}88`;
+    ctx.beginPath();
+    ctx.arc(x - size/3, y - size/3, size/2, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawMilkyWay(y) {
+    const gradient = ctx.createRadialGradient(
+        canvas.width/2, y, 0,
+        canvas.width/2, y, canvas.width
+    );
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+    gradient.addColorStop(0.5, 'rgba(155, 176, 255, 0.1)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, y - canvas.width/2, canvas.width, canvas.width);
+}
+
 function drawBackground() {
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, "#87CEEB");
-    gradient.addColorStop(1, "#E0F6FF");
+    // Calculate how dark the sky should be based on score
+    const darkness = Math.min(0.8, score / 10000); // Max darkness of 0.8
+    
+    // Create gradient from ground to space
+    const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
+    gradient.addColorStop(0, "#E0F6FF"); // Ground level - light blue
+    gradient.addColorStop(0.3, "#87CEEB"); // Sky blue
+    gradient.addColorStop(0.6, `rgba(25, 25, 112, ${darkness})`); // Dark blue
+    gradient.addColorStop(1, `rgba(0, 0, 0, ${darkness})`); // Space black
+    
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw Milky Way (visible in higher scores)
+    if (score > 2000) {
+        drawMilkyWay(-1000 + (score/10) % 2000);
+    }
+    
+    // Draw stars with parallax effect
+    stars.forEach(star => {
+        const adjustedY = (star.y - (score/2)) % (canvas.height * 3);
+        if (adjustedY < canvas.height) {
+            const brightness = Math.min(1, score / 2000);
+            ctx.globalAlpha = brightness;
+            drawStar(star.x, adjustedY, star.size);
+        }
+    });
+    
+    // Draw planets
+    planets.forEach(planet => {
+        const adjustedY = planet.baseY + (score/2) % 3000;
+        if (adjustedY > -100 && adjustedY < canvas.height + 100) {
+            drawPlanet(planet.x, adjustedY, planet.size, planet.color);
+        }
+    });
+    
+    ctx.globalAlpha = 1; // Reset global alpha
 }
 
 function gameLoop() {
