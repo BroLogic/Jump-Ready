@@ -7,17 +7,37 @@ const jumpSound = document.getElementById('jumpSound');
 
 // Load sounds
 window.addEventListener('load', () => {
+    console.log('Loading sound files...');
+    
     revSound.src = 'rev.mp3';
+    revSound.addEventListener('canplaythrough', () => {
+        console.log('Rev sound loaded successfully');
+    });
+    revSound.addEventListener('error', (e) => {
+        console.error('Error loading rev sound:', e);
+    });
+    
     jumpSound.src = 'boing.mp3';
+    jumpSound.addEventListener('canplaythrough', () => {
+        console.log('Jump sound loaded successfully');
+    });
+    jumpSound.addEventListener('error', (e) => {
+        console.error('Error loading jump sound:', e);
+    });
 });
 
 // Sound functions
 function playRevSound() {
-    console.log("Playing rev sound");
+    console.log("Attempting to play rev sound...");
+    console.log("Rev sound ready state:", revSound.readyState);
     try {
-        if (revSound.readyState === 4) { // HAVE_ENOUGH_DATA
+        if (revSound.readyState >= 2) { // HAVE_CURRENT_DATA or better
             revSound.currentTime = 0;
-            revSound.play().catch(error => console.error('Error playing rev sound:', error));
+            revSound.play()
+                .then(() => console.log("Rev sound played successfully"))
+                .catch(error => console.error('Error playing rev sound:', error));
+        } else {
+            console.log("Rev sound not ready yet");
         }
     } catch (error) {
         console.error('Error playing rev sound:', error);
@@ -25,11 +45,16 @@ function playRevSound() {
 }
 
 function playJumpSound() {
-    console.log("Playing jump sound");
+    console.log("Attempting to play jump sound...");
+    console.log("Jump sound ready state:", jumpSound.readyState);
     try {
-        if (jumpSound.readyState === 4) { // HAVE_ENOUGH_DATA
+        if (jumpSound.readyState >= 2) { // HAVE_CURRENT_DATA or better
             jumpSound.currentTime = 0;
-            jumpSound.play().catch(error => console.error('Error playing jump sound:', error));
+            jumpSound.play()
+                .then(() => console.log("Jump sound played successfully"))
+                .catch(error => console.error('Error playing jump sound:', error));
+        } else {
+            console.log("Jump sound not ready yet");
         }
     } catch (error) {
         console.error('Error playing jump sound:', error);
