@@ -11,14 +11,28 @@ const player = {
     velocityY: 0,
     isJumping: false,
     moveLeft: false,
-    moveRight: false
+    moveRight: false,
+    hasJetpack: false,
+    jetpackTimer: 0,
+    jetpackDuration: 480 // 8 seconds at 60 FPS
 };
 
 let platforms = [];
 let coins = [];
+let jetpacks = [];
 let score = 0;
 let coinCount = parseInt(localStorage.getItem('coinCount') || 0, 10);
 let highScore = parseInt(localStorage.getItem('highScore') || 0, 10);
+
+function generateJetpack(platform) {
+    return {
+        x: platform.x + platform.width / 2 - 15,
+        y: platform.y - 40,
+        width: 30,
+        height: 40,
+        collected: false
+    };
+}
 
 function generatePlatform(y, isStarting = false) {
     const minWidth = Math.max(30, 100 - score / 100); // Platform width decreases as score increases
@@ -58,6 +72,22 @@ for (let i = 0; i < 7; i++) {
 }
 
 function drawPlayer() {
+    // Draw jetpack if active
+    if (player.hasJetpack) {
+        // Jetpack body
+        ctx.fillStyle = '#707070';
+        ctx.fillRect(player.x - 10, player.y + 5, 10, 20);
+        
+        // Flame effect
+        ctx.fillStyle = '#FF4500';
+        ctx.beginPath();
+        ctx.moveTo(player.x - 10, player.y + 25);
+        ctx.lineTo(player.x - 5, player.y + 35);
+        ctx.lineTo(player.x, player.y + 25);
+        ctx.fill();
+    }
+
+    // Player body
     ctx.fillStyle = '#4a90e2';
     ctx.fillRect(player.x, player.y, player.width, player.height);
     
@@ -123,9 +153,35 @@ function drawCoins() {
 }
 
 function update() {
-    // Apply gravity
-    player.velocityY += 0.8;
+    // Handle jetpack physics and timer
+    if (player.hasJetpack) {
+        player.jetpackTimer++;
+        if (player.jetpackTimer >= player.jetpackDuration) {
+            player.hasJetpack = false;
+            player.jetpackTimer = 0;
+        } else {
+            player.velocityY = -8; // Constant upward force
+        }
+    }
+
+    // Apply gravity if not using jetpack
+    if (!player.hasJetpack) {
+        player.velocityY += 0.8;
+    }
     player.y += player.velocityY;
+
+    // Check for jetpack collection
+    jetpacks.forEach(jetpack => {
+        if (!jetpack.collected &&
+            player.x < jetpack.x + jetpack.width &&
+            player.x + player.width > jetpack.x &&
+            player.y < jetpack.y + jetpack.height &&
+            player.y + player.height > jetpack.y) {
+            jetpack.collected = true;
+            player.hasJetpack = true;
+            player.jetpackTimer = 0;
+        }
+    });
 
     // Handle player movement
     if (player.moveLeft) {
@@ -185,7 +241,7 @@ function update() {
         }
     });
 
-    // Move platforms and coins down and remove off-screen ones
+    // Move platforms, coins, and jetpacks down and remove off-screen ones
     if (player.y < 300) {
         const moveDistance = 300 - player.y;
         player.y = 300;
@@ -195,11 +251,15 @@ function update() {
         coins.forEach(coin => {
             coin.y += moveDistance;
         });
+        jetpacks.forEach(jetpack => {
+            jetpack.y += moveDistance;
+        });
         score += Math.floor(moveDistance);
     
-        // Remove off-screen platforms and coins, and add new ones
+        // Remove off-screen platforms, coins, and jetpacks, and add new ones
         platforms = platforms.filter(platform => platform.y < canvas.height);
         coins = coins.filter(coin => coin.y < canvas.height);
+        jetpacks = jetpacks.filter(jetpack => jetpack.y < canvas.height);
 
         // Add new platforms and coins
         while (platforms.length < 7 || platforms[platforms.length - 1].y > 0) {
@@ -211,7 +271,11 @@ function update() {
             const newPlatformY = highestPlatform.y - minDistance - Math.random() * (maxDistance - minDistance);
             const newPlatform = generatePlatform(newPlatformY);
             platforms.push(newPlatform);
-            if (Math.random() < 0.7) { // 70% chance to spawn a coin on a platform
+            
+            // Add coin or jetpack
+            if (platforms.length % 20 === 0) { // Every 20th platform gets a jetpack
+                jetpacks.push(generateJetpack(newPlatform));
+            } else if (Math.random() < 0.7) { // 70% chance to spawn a coin on other platforms
                 coins.push(generateCoin(newPlatform));
             }
         }
@@ -253,6 +317,7 @@ function update() {
 function resetGame() {
     platforms.length = 0;
     coins.length = 0;
+    jetpacks.length = 0;
     const startY = canvas.height - 200; // Start generating platforms from this y-coordinate
     for (let i = 0; i < 7; i++) {
         const platform = generatePlatform(startY - i * 100, i === 0); // The first platform (i === 0) is the starting platform
@@ -396,12 +461,33 @@ function drawBackground() {
     ctx.globalAlpha = 1; // Reset global alpha
 }
 
+function drawJetpacks() {
+    jetpacks.forEach(jetpack => {
+        if (!jetpack.collected) {
+            // Draw jetpack body
+            ctx.fillStyle = '#505050';
+            ctx.fillRect(jetpack.x, jetpack.y, jetpack.width, jetpack.height);
+            
+            // Draw straps
+            ctx.fillStyle = '#303030';
+            ctx.fillRect(jetpack.x + 5, jetpack.y, 5, 10);
+            ctx.fillRect(jetpack.x + 20, jetpack.y, 5, 10);
+            
+            // Draw nozzles
+            ctx.fillStyle = '#606060';
+            ctx.fillRect(jetpack.x + 5, jetpack.y + 30, 7, 10);
+            ctx.fillRect(jetpack.x + 18, jetpack.y + 30, 7, 10);
+        }
+    });
+}
+
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
     update();
     drawPlatforms();
     drawCoins();
+    drawJetpacks();
     drawPlayer();
     drawScore();
     requestAnimationFrame(gameLoop);
