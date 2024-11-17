@@ -206,8 +206,27 @@ function drawShop() {
     ctx.textAlign = 'center';
     ctx.fillText('Skin Shop', canvas.width/2, 50);
     
-    // Draw skins
+    // Draw jetpack purchase option if available
     let y = 100;
+    if (jetpackPurchaseAvailable && (Date.now() - gameStartTime) < 7000) {
+        // Jetpack icon
+        ctx.fillStyle = '#505050';
+        ctx.fillRect(canvas.width/2 - 100, y, 30, 30);
+        
+        // Jetpack name and price
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'left';
+        ctx.font = '18px Arial';
+        ctx.fillText('Starter Jetpack', canvas.width/2 - 50, y + 20);
+        
+        // Price
+        ctx.fillStyle = coinCount >= 100 ? '#2ecc71' : '#e74c3c';
+        ctx.fillText('100 coins', canvas.width/2 + 50, y + 20);
+        
+        y += 50;
+    }
+
+    // Draw skins
     Object.entries(skins).forEach(([id, skin]) => {
         // Skin preview box
         ctx.fillStyle = skin.color;
@@ -464,6 +483,8 @@ function resetGame() {
     platforms.length = 0;
     coins.length = 0;
     jetpacks.length = 0;
+    gameStartTime = Date.now();
+    jetpackPurchaseAvailable = true;
     playRevSound(); // Play rev sound when game starts/restarts
     const startY = canvas.height - 200; // Start generating platforms from this y-coordinate
     for (let i = 0; i < 7; i++) {
@@ -630,6 +651,8 @@ function drawJetpacks() {
 }
 
 let shopOpen = false;
+let gameStartTime = Date.now();
+let jetpackPurchaseAvailable = true;
 
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -657,8 +680,23 @@ function handleShopClick(event) {
         return;
     }
     
-    // Check skin clicks
+    // Check jetpack purchase
     let currentY = 100;
+    if (jetpackPurchaseAvailable && 
+        (Date.now() - gameStartTime) < 7000 && 
+        y >= currentY && y <= currentY + 30 && 
+        x >= canvas.width/2 - 100 && x <= canvas.width/2 + 100) {
+        if (coinCount >= 100) {
+            coinCount -= 100;
+            player.hasJetpack = true;
+            player.jetpackTimer = 0;
+            jetpackPurchaseAvailable = false;
+            localStorage.setItem('coinCount', coinCount);
+        }
+        currentY += 50;
+    }
+
+    // Check skin clicks
     Object.entries(skins).forEach(([id, skin]) => {
         if (y >= currentY && y <= currentY + 30 && x >= canvas.width/2 - 100 && x <= canvas.width/2 + 100) {
             if (skin.owned) {
