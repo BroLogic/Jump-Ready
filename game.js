@@ -127,18 +127,22 @@ function generatePlatform(y, isStarting = false) {
     const minWidth = Math.max(30, 100 - score / 100); // Platform width decreases as score increases
     const width = minWidth + Math.random() * (100 - minWidth);
     const isShortcut = !isStarting && Math.random() < 0.1; // 10% chance for a shortcut platform
+    const isVertical = !isStarting && !isShortcut && Math.random() < 0.15; // 15% chance for vertical moving platform
     return {
         x: Math.random() * (canvas.width - width),
         y: y,
         width: width,
         height: 20,
-        isMoving: !isShortcut && Math.random() < 0.25, // 25% chance for a platform to be moving (not for shortcuts)
-        direction: 1, // 1 for right, -1 for left
+        isMoving: !isShortcut && !isVertical && Math.random() < 0.25, // 25% chance for horizontal movement
+        isVertical: isVertical, // Flag for vertical movement
+        direction: 1, // 1 for right/up, -1 for left/down
         speed: 1 + Math.random() * 2, // Random speed between 1 and 3
-        isCrumbling: !isStarting && !isShortcut && Math.random() < 0.25, // 25% chance for regular platforms to crumble
+        baseY: y, // Store original Y position for vertical movement
+        verticalRange: 100, // Range of vertical movement
+        isCrumbling: !isStarting && !isShortcut && !isVertical && Math.random() < 0.25, // 25% chance for regular platforms to crumble
         isShortcut: isShortcut, // Flag for shortcut platforms
         crumbleTimer: 0,
-        color: isShortcut ? '#e74c3c' : '#2ecc71' // Red for shortcuts, green for regular
+        color: isShortcut ? '#e74c3c' : (isVertical ? '#3498db' : '#2ecc71') // Red for shortcuts, blue for vertical, green for regular
     };
 }
 
@@ -341,6 +345,8 @@ function update() {
             if (platform.x <= 0 || platform.x + platform.width >= canvas.width) {
                 platform.direction *= -1; // Reverse direction when hitting the edge
             }
+        } else if (platform.isVertical) {
+            platform.y = platform.baseY + Math.sin(Date.now() / 1000) * platform.verticalRange;
         }
 
         if (player.x < platform.x + platform.width &&
