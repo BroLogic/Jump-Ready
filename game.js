@@ -7,13 +7,15 @@ const jumpSound = document.getElementById('jumpSound');
 
 // Sound functions
 function playRevSound() {
+    console.log("Playing rev sound");
     revSound.currentTime = 0;
-    revSound.play();
+    revSound.play().catch(error => console.error('Error playing rev sound:', error));
 }
 
 function playJumpSound() {
+    console.log("Playing jump sound");
     jumpSound.currentTime = 0;
-    jumpSound.play();
+    jumpSound.play().catch(error => console.error('Error playing jump sound:', error));
 }
 
 const skins = {
