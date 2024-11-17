@@ -369,8 +369,10 @@ function update() {
                 if (platform.isMoving) {
                     player.x += platform.direction * platform.speed;
                 } else if (platform.isVertical) {
-                    // Add vertical movement to player when on vertical platform
-                    player.y = effectiveY - player.height;
+                    // Only adjust player position if they're about to lose contact with platform
+                    if (player.y > effectiveY - player.height + 5) {
+                        player.y = effectiveY - player.height;
+                    }
                 }
 
                 // Handle crumbling and shortcut platforms
