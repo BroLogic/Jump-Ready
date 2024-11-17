@@ -1,20 +1,48 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+const skins = {
+    default: {
+        name: 'Default',
+        color: '#4a90e2',
+        price: 0,
+        owned: true
+    },
+    red: {
+        name: 'Red Hot',
+        color: '#e74c3c',
+        price: 50,
+        owned: false
+    },
+    green: {
+        name: 'Emerald',
+        color: '#2ecc71',
+        price: 100,
+        owned: false
+    },
+    gold: {
+        name: 'Golden',
+        color: '#f1c40f',
+        price: 200,
+        owned: false
+    }
+};
+
 const player = {
     x: 200,
     y: 300,
     width: 30,
     height: 30,
     speed: 5,
-    jumpForce: 17,  // Increased jump force
+    jumpForce: 17,
     velocityY: 0,
     isJumping: false,
     moveLeft: false,
     moveRight: false,
     hasJetpack: false,
     jetpackTimer: 0,
-    jetpackDuration: 180 // 3 seconds at 60 FPS
+    jetpackDuration: 180,
+    currentSkin: 'default'
 };
 
 let platforms = [];
@@ -88,8 +116,8 @@ function drawPlayer() {
         ctx.fill();
     }
 
-    // Player body
-    ctx.fillStyle = '#4a90e2';
+    // Player body with current skin
+    ctx.fillStyle = skins[player.currentSkin].color;
     ctx.fillRect(player.x, player.y, player.width, player.height);
     
     // Draw eyes
@@ -101,6 +129,57 @@ function drawPlayer() {
     ctx.fillStyle = 'black';
     ctx.fillRect(player.x + 7, player.y + 7, 4, 4);
     ctx.fillRect(player.x + player.width - 11, player.y + 7, 4, 4);
+}
+
+function drawShop() {
+    if (!shopOpen) return;
+    
+    // Shop background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Shop title
+    ctx.fillStyle = 'white';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Skin Shop', canvas.width/2, 50);
+    
+    // Draw skins
+    let y = 100;
+    Object.entries(skins).forEach(([id, skin]) => {
+        // Skin preview box
+        ctx.fillStyle = skin.color;
+        ctx.fillRect(canvas.width/2 - 100, y, 30, 30);
+        
+        // Skin name and price
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'left';
+        ctx.font = '18px Arial';
+        ctx.fillText(skin.name, canvas.width/2 - 50, y + 20);
+        
+        // Price or "Owned" status
+        if (skin.owned) {
+            if (player.currentSkin === id) {
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillText('EQUIPPED', canvas.width/2 + 50, y + 20);
+            } else {
+                ctx.fillStyle = '#3498db';
+                ctx.fillText('OWNED', canvas.width/2 + 50, y + 20);
+            }
+        } else {
+            ctx.fillStyle = coinCount >= skin.price ? '#2ecc71' : '#e74c3c';
+            ctx.fillText(`${skin.price} coins`, canvas.width/2 + 50, y + 20);
+        }
+        y += 50;
+    });
+    
+    // Close button
+    ctx.fillStyle = '#e74c3c';
+    ctx.fillRect(canvas.width - 60, 20, 40, 40);
+    ctx.fillStyle = 'white';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('X', canvas.width - 40, 45);
 }
 
 function drawPlatforms() {
@@ -486,6 +565,8 @@ function drawJetpacks() {
     });
 }
 
+let shopOpen = false;
+
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
@@ -495,7 +576,39 @@ function gameLoop() {
     drawJetpacks();
     drawPlayer();
     drawScore();
+    drawShop();
     requestAnimationFrame(gameLoop);
+}
+
+function handleShopClick(event) {
+    if (!shopOpen) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // Close button
+    if (x >= canvas.width - 60 && x <= canvas.width - 20 && y >= 20 && y <= 60) {
+        shopOpen = false;
+        return;
+    }
+    
+    // Check skin clicks
+    let currentY = 100;
+    Object.entries(skins).forEach(([id, skin]) => {
+        if (y >= currentY && y <= currentY + 30 && x >= canvas.width/2 - 100 && x <= canvas.width/2 + 100) {
+            if (skin.owned) {
+                player.currentSkin = id;
+            } else if (coinCount >= skin.price) {
+                coinCount -= skin.price;
+                skin.owned = true;
+                player.currentSkin = id;
+                localStorage.setItem('coinCount', coinCount);
+                localStorage.setItem('skins', JSON.stringify(skins));
+            }
+        }
+        currentY += 50;
+    });
 }
 
 document.addEventListener('keydown', (event) => {
@@ -516,8 +629,23 @@ document.addEventListener('keyup', (event) => {
         player.moveLeft = false;
     } else if (event.code === 'ArrowRight' || event.code === 'KeyD') {
         player.moveRight = false;
+    } else if (event.code === 'KeyS') {
+        shopOpen = !shopOpen;
     }
 });
+
+canvas.addEventListener('click', handleShopClick);
+
+// Load saved skins on startup
+const savedSkins = localStorage.getItem('skins');
+if (savedSkins) {
+    const loadedSkins = JSON.parse(savedSkins);
+    Object.keys(skins).forEach(id => {
+        if (loadedSkins[id]) {
+            skins[id].owned = loadedSkins[id].owned;
+        }
+    });
+}
 
 resetGame();
 gameLoop();
