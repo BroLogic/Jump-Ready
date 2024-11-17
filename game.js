@@ -21,6 +21,7 @@ let platforms = [];
 let coins = [];
 let jetpacks = [];
 let score = 0;
+let platformsSinceLastJetpack = 0;
 let coinCount = parseInt(localStorage.getItem('coinCount') || 0, 10);
 let highScore = parseInt(localStorage.getItem('highScore') || 0, 10);
 
@@ -273,9 +274,12 @@ function update() {
             platforms.push(newPlatform);
             
             // Add coin or jetpack
-            if (platforms.length % 20 === 0) { // Every 20th platform gets a jetpack
+            platformsSinceLastJetpack++;
+            
+            if (platformsSinceLastJetpack >= 25 && platformsSinceLastJetpack <= 55 && Math.random() < 0.2) { // 20% chance within valid range
                 jetpacks.push(generateJetpack(newPlatform));
-            } else if (Math.random() < 0.7) { // 70% chance to spawn a coin on other platforms
+                platformsSinceLastJetpack = 0;
+            } else if (Math.random() < 0.7) { // 70% chance to spawn a coin
                 coins.push(generateCoin(newPlatform));
             }
         }
@@ -336,6 +340,7 @@ function resetGame() {
     player.moveRight = false;
     player.isJumping = false;
     score = 0;
+    platformsSinceLastJetpack = 0;
     // We don't reset highScore or coinCount here anymore
 }
 
