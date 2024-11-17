@@ -324,12 +324,10 @@ function drawBackground() {
     // Calculate how dark the sky should be based on score
     const darkness = Math.min(0.8, score / 10000); // Max darkness of 0.8
     
-    // Create gradient from ground to space
+    // Create gradient from sky blue to space
     const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
-    gradient.addColorStop(0, "#E0F6FF"); // Ground level - light blue
-    gradient.addColorStop(0.3, "#87CEEB"); // Sky blue
-    gradient.addColorStop(0.6, `rgba(25, 25, 112, ${darkness})`); // Dark blue
-    gradient.addColorStop(1, `rgba(0, 0, 0, ${darkness})`); // Space black
+    gradient.addColorStop(0, "#87CEEB"); // Sky blue
+    gradient.addColorStop(1, `rgba(0, 0, ${40 + (1-darkness)*75}, ${1-darkness})`); // Fade to space
     
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
