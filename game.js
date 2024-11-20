@@ -691,7 +691,8 @@ function handleShopClick(event) {
         x >= canvas.width/2 - 100 && x <= canvas.width/2 + 100) {
         if (coinCount >= 100) {
             coinCount -= 100;
-            player.hasJetpack = true;
+            player.jetpackReady = true;
+            player.hasJetpack = false;
             player.jetpackTimer = 0;
             jetpackPurchaseAvailable = false;
             localStorage.setItem('coinCount', coinCount);
