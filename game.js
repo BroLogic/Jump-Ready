@@ -66,25 +66,41 @@ const skins = {
         name: 'Default',
         color: '#4a90e2',
         price: 0,
-        owned: true
+        owned: true,
+        trail: {
+            color: '#4a90e2',
+            type: 'sparkle'
+        }
     },
     red: {
         name: 'Red Hot',
         color: '#e74c3c',
         price: 50,
-        owned: false
+        owned: false,
+        trail: {
+            color: '#ff6b6b',
+            type: 'fire'
+        }
     },
     green: {
         name: 'Emerald',
         color: '#2ecc71',
         price: 100,
-        owned: false
+        owned: false,
+        trail: {
+            color: '#7bed9f',
+            type: 'leaves'
+        }
     },
     gold: {
         name: 'Golden',
         color: '#f1c40f',
         price: 200,
-        owned: false
+        owned: false,
+        trail: {
+            color: '#ffd700',
+            type: 'stars'
+        }
     }
 };
 
@@ -103,7 +119,8 @@ const player = {
     jetpackReady: false,
     jetpackTimer: 0,
     jetpackDuration: 180,
-    currentSkin: 'default'
+    currentSkin: 'default',
+    trailPoints: []
 };
 
 let platforms = [];
@@ -322,6 +339,91 @@ function drawCoins() {
             ctx.fillText('?', centerX, centerY);
         }
     });
+}
+
+function drawTrail() {
+    const skin = skins[player.currentSkin];
+    const trail = skin.trail;
+    
+    // Add new trail point
+    if (player.velocityY !== 0 || player.moveLeft || player.moveRight) {
+        player.trailPoints.push({
+            x: player.x + player.width / 2,
+            y: player.y + player.height,
+            age: 0
+        });
+    }
+    
+    // Update and draw trail points
+    for (let i = player.trailPoints.length - 1; i >= 0; i--) {
+        const point = player.trailPoints[i];
+        point.age++;
+        
+        if (point.age > 20) {
+            player.trailPoints.splice(i, 1);
+            continue;
+        }
+        
+        const opacity = 1 - (point.age / 20);
+        ctx.globalAlpha = opacity;
+        
+        switch (trail.type) {
+            case 'fire':
+                drawFireParticle(point, trail.color);
+                break;
+            case 'leaves':
+                drawLeafParticle(point, trail.color);
+                break;
+            case 'stars':
+                drawStarParticle(point, trail.color);
+                break;
+            case 'sparkle':
+                drawSparkleParticle(point, trail.color);
+                break;
+        }
+    }
+    ctx.globalAlpha = 1;
+}
+
+function drawFireParticle(point, color) {
+    const size = 10 - (point.age / 3);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(point.x, point.y);
+    ctx.lineTo(point.x - size/2, point.y - size);
+    ctx.lineTo(point.x + size/2, point.y - size);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawLeafParticle(point, color) {
+    const size = 8 - (point.age / 3);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.ellipse(point.x, point.y, size, size/2, point.age/2, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawStarParticle(point, color) {
+    const size = 8 - (point.age / 3);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+        const angle = (i * 4 * Math.PI) / 5;
+        const x = point.x + Math.cos(angle) * size;
+        const y = point.y + Math.sin(angle) * size;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawSparkleParticle(point, color) {
+    const size = 6 - (point.age / 4);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+    ctx.fill();
 }
 
 function update() {
@@ -675,6 +777,7 @@ function gameLoop() {
     drawPlatforms();
     drawCoins();
     drawJetpacks();
+    drawTrail();
     drawPlayer();
     drawScore();
     drawShop();
