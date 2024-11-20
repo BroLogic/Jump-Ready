@@ -484,7 +484,9 @@ function resetGame() {
     coins.length = 0;
     jetpacks.length = 0;
     gameStartTime = Date.now();
-    jetpackPurchaseAvailable = true;
+    if (!player.hasJetpack) {
+        jetpackPurchaseAvailable = true;
+    }
     playRevSound(); // Play rev sound when game starts/restarts
     const startY = canvas.height - 200; // Start generating platforms from this y-coordinate
     for (let i = 0; i < 7; i++) {
@@ -682,7 +684,7 @@ function handleShopClick(event) {
     
     // Check jetpack purchase
     let currentY = 100;
-    if (jetpackPurchaseAvailable && 
+    if (jetpackPurchaseAvailable && !player.hasJetpack &&
         y >= currentY && y <= currentY + 30 && 
         x >= canvas.width/2 - 100 && x <= canvas.width/2 + 100) {
         if (coinCount >= 100) {
