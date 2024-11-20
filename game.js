@@ -206,9 +206,9 @@ function drawShop() {
     ctx.textAlign = 'center';
     ctx.fillText('Skin Shop', canvas.width/2, 50);
     
-    // Draw jetpack purchase option if available
+    // Draw jetpack purchase option
     let y = 100;
-    if (jetpackPurchaseAvailable && (Date.now() - gameStartTime) < 7000) {
+    if (jetpackPurchaseAvailable) {
         // Jetpack icon
         ctx.fillStyle = '#505050';
         ctx.fillRect(canvas.width/2 - 100, y, 30, 30);
@@ -683,7 +683,6 @@ function handleShopClick(event) {
     // Check jetpack purchase
     let currentY = 100;
     if (jetpackPurchaseAvailable && 
-        (Date.now() - gameStartTime) < 7000 && 
         y >= currentY && y <= currentY + 30 && 
         x >= canvas.width/2 - 100 && x <= canvas.width/2 + 100) {
         if (coinCount >= 100) {
