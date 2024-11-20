@@ -213,15 +213,15 @@ function drawShop() {
         ctx.fillStyle = '#505050';
         ctx.fillRect(canvas.width/2 - 100, y, 30, 30);
         
-        // Jetpack name and price
+        // Jetpack name
         ctx.fillStyle = 'white';
         ctx.textAlign = 'left';
         ctx.font = '18px Arial';
         ctx.fillText('Starter Jetpack', canvas.width/2 - 50, y + 20);
         
-        // Price
+        // Price (moved further right)
         ctx.fillStyle = coinCount >= 100 ? '#2ecc71' : '#e74c3c';
-        ctx.fillText('100 coins', canvas.width/2 + 50, y + 20);
+        ctx.fillText('100 coins', canvas.width/2 + 100, y + 20);
         
         y += 50;
     }
