@@ -100,6 +100,7 @@ const player = {
     moveLeft: false,
     moveRight: false,
     hasJetpack: false,
+    jetpackReady: false,
     jetpackTimer: 0,
     jetpackDuration: 180,
     currentSkin: 'default'
@@ -339,7 +340,8 @@ function update() {
             player.y < jetpack.y + jetpack.height &&
             player.y + player.height > jetpack.y) {
             jetpack.collected = true;
-            player.hasJetpack = true;
+            player.jetpackReady = true;
+            player.hasJetpack = false;
             player.jetpackTimer = 0;
         }
     });
@@ -715,6 +717,12 @@ function handleShopClick(event) {
 }
 
 document.addEventListener('keydown', (event) => {
+    // Activate jetpack on any key press if it's ready
+    if (player.jetpackReady) {
+        player.hasJetpack = true;
+        player.jetpackReady = false;
+    }
+
     if (event.code === 'ArrowLeft' || event.code === 'KeyA') {
         player.moveLeft = true;
     } else if (event.code === 'ArrowRight' || event.code === 'KeyD') {
