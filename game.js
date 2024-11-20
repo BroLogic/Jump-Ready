@@ -277,6 +277,16 @@ function drawScore() {
     ctx.fillText(`Score: ${score}`, 80, 30);
     ctx.fillText(`High Score: ${highScore}`, 80, 60);
     ctx.fillText(`Coins: ${coinCount}`, 80, 90);
+    
+    // Draw jetpack timer if active
+    if (player.hasJetpack) {
+        const timeLeft = Math.ceil((player.jetpackDuration - player.jetpackTimer) / 60); // Convert to seconds
+        ctx.fillStyle = timeLeft <= 3 ? 'red' : 'black';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Jetpack: ${timeLeft}s`, canvas.width / 2, canvas.height - 30);
+        ctx.textAlign = 'left'; // Reset text alignment
+    }
 }
 
 function drawCoins() {
