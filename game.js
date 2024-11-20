@@ -754,9 +754,6 @@ document.addEventListener('keyup', (event) => {
         player.moveRight = false;
     } else if (event.code === 'KeyS') {
         shopOpen = !shopOpen;
-    } else if (event.code === 'KeyQ') {
-        coinCount = 999999;
-        localStorage.setItem('coinCount', coinCount);
     }
 });
 
