@@ -101,6 +101,46 @@ const skins = {
             color: '#ffd700',
             type: 'stars'
         }
+    },
+    music: {
+        name: 'Melodic',
+        color: '#9b59b6',
+        price: 300,
+        owned: false,
+        trail: {
+            color: '#9b59b6',
+            type: 'notes'
+        }
+    },
+    banana: {
+        name: 'Banana',
+        color: '#f1c40f',
+        price: 350,
+        owned: false,
+        trail: {
+            color: '#f1c40f',
+            type: 'peels'
+        }
+    },
+    rainbow: {
+        name: 'Rainbow',
+        color: '#e056fd',
+        price: 500,
+        owned: false,
+        trail: {
+            color: '#e056fd',
+            type: 'rainbow'
+        }
+    },
+    ninja: {
+        name: 'Ninja',
+        color: '#2c3e50',
+        price: 400,
+        owned: false,
+        trail: {
+            color: '#95a5a6',
+            type: 'smoke'
+        }
     }
 };
 
@@ -380,6 +420,18 @@ function drawTrail() {
             case 'sparkle':
                 drawSparkleParticle(point, trail.color);
                 break;
+            case 'notes':
+                drawNoteParticle(point, trail.color);
+                break;
+            case 'peels':
+                drawPeelParticle(point, trail.color);
+                break;
+            case 'rainbow':
+                drawRainbowParticle(point);
+                break;
+            case 'smoke':
+                drawSmokeParticle(point, trail.color);
+                break;
         }
     }
     ctx.globalAlpha = 1;
@@ -423,6 +475,50 @@ function drawSparkleParticle(point, color) {
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawNoteParticle(point, color) {
+    const size = 10 - (point.age / 3);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    // Draw music note
+    ctx.moveTo(point.x, point.y);
+    ctx.lineTo(point.x, point.y - size);
+    ctx.lineTo(point.x + size/2, point.y - size);
+    ctx.arc(point.x + size/2, point.y - size/2, size/2, -Math.PI/2, Math.PI/2);
+    ctx.fill();
+}
+
+function drawPeelParticle(point, color) {
+    const size = 12 - (point.age / 3);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    // Draw banana peel shape
+    ctx.arc(point.x, point.y, size/2, 0, Math.PI, true);
+    ctx.arc(point.x - size/3, point.y, size/4, 0, Math.PI, false);
+    ctx.arc(point.x + size/3, point.y, size/4, 0, Math.PI, false);
+    ctx.fill();
+}
+
+function drawRainbowParticle(point) {
+    const size = 8 - (point.age / 3);
+    // Cycle through rainbow colors based on age
+    const hue = (point.age * 20) % 360;
+    ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawSmokeParticle(point, color) {
+    const size = 10 - (point.age / 3);
+    ctx.fillStyle = `rgba(44, 62, 80, ${0.5 - point.age/40})`;
+    ctx.beginPath();
+    // Draw smoke cloud shape
+    ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+    ctx.arc(point.x - size/2, point.y - size/2, size/1.5, 0, Math.PI * 2);
+    ctx.arc(point.x + size/2, point.y - size/2, size/1.5, 0, Math.PI * 2);
     ctx.fill();
 }
 
