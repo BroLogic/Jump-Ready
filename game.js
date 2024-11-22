@@ -806,6 +806,43 @@ function gameLoop() {
     drawPlayer();
     drawScore();
     drawShop();
+    
+    // Draw help button
+    ctx.fillStyle = '#4a90e2';
+    ctx.beginPath();
+    ctx.arc(helpButton.x + 20, helpButton.y + 20, 20, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Draw controller emoji
+    ctx.fillStyle = 'white';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🎮', helpButton.x + 20, helpButton.y + 20);
+    
+    // Draw controls popup if visible
+    if (helpButton.isPopupVisible) {
+        const controls = [
+            '🎮 Game Controls:',
+            '→ or D : Move Right',
+            '← or A : Move Left',
+            '↑ or W or SPACE : Jump',
+            'S : Open/Close Shop',
+            'Any key : Activate Jetpack'
+        ];
+        
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.roundRect(helpButton.x - 160, helpButton.y - 150, 180, 150, 8);
+        ctx.fill();
+        
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'left';
+        controls.forEach((text, i) => {
+            ctx.fillText(text, helpButton.x - 150, helpButton.y - 130 + (i * 22));
+        });
+    }
+    
     requestAnimationFrame(gameLoop);
 }
 
@@ -887,20 +924,27 @@ document.addEventListener('keyup', (event) => {
 
 canvas.addEventListener('click', handleShopClick);
 
-// Help button functionality
-const helpButton = document.getElementById('helpButton');
-const controlsPopup = document.getElementById('controlsPopup');
+// Help button state
+const helpButton = {
+    x: canvas.width - 50,
+    y: canvas.height - 50,
+    width: 40,
+    height: 40,
+    isPopupVisible: false
+};
 
-helpButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    const isVisible = controlsPopup.style.display === 'block';
-    controlsPopup.style.display = isVisible ? 'none' : 'block';
-});
+// Handle help button clicks
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
 
-// Close popup when clicking outside
-document.addEventListener('click', (e) => {
-    if (e.target !== helpButton && e.target !== controlsPopup && !controlsPopup.contains(e.target)) {
-        controlsPopup.style.display = 'none';
+    // Check if help button was clicked
+    if (clickX >= helpButton.x && clickX <= helpButton.x + helpButton.width &&
+        clickY >= helpButton.y && clickY <= helpButton.y + helpButton.height) {
+        helpButton.isPopupVisible = !helpButton.isPopupVisible;
+    } else {
+        helpButton.isPopupVisible = false;
     }
 });
 
