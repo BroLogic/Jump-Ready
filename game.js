@@ -139,7 +139,6 @@ let jetpacks = [];
 let score = 0;
 let platformsSinceLastJetpack = 0;
 let globalHighScore = 0;
-let infiniteJetpackActive = false;
 
 // Fetch initial global high score
 fetch('http://localhost:3000/highscore')
@@ -465,12 +464,10 @@ function drawRainbowParticle(point) {
 function update() {
     // Handle jetpack physics and timer
     if (player.hasJetpack) {
-        if (!infiniteJetpackActive) {
-            player.jetpackTimer++;
-            if (player.jetpackTimer >= player.jetpackDuration) {
-                player.hasJetpack = false;
-                player.jetpackTimer = 0;
-            }
+        player.jetpackTimer++;
+        if (player.jetpackTimer >= player.jetpackDuration) {
+            player.hasJetpack = false;
+            player.jetpackTimer = 0;
         }
         player.velocityY = -8; // Constant upward force
     }
@@ -921,12 +918,8 @@ function handleShopClick(event) {
 }
 
 document.addEventListener('keydown', (event) => {
-    if (event.code === 'KeyM') {
-        infiniteJetpackActive = true;
-        player.hasJetpack = true;
-    }
     // Activate jetpack on any key press if it's ready
-    else if (player.jetpackReady) {
+    if (player.jetpackReady) {
         player.hasJetpack = true;
         player.jetpackReady = false;
     }
@@ -951,9 +944,6 @@ document.addEventListener('keyup', (event) => {
         player.moveRight = false;
     } else if (event.code === 'KeyS') {
         shopOpen = !shopOpen;
-    } else if (event.code === 'KeyM') {
-        infiniteJetpackActive = false;
-        player.hasJetpack = false;
     }
 });
 
