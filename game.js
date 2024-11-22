@@ -887,6 +887,23 @@ document.addEventListener('keyup', (event) => {
 
 canvas.addEventListener('click', handleShopClick);
 
+// Help button functionality
+const helpButton = document.getElementById('helpButton');
+const controlsPopup = document.getElementById('controlsPopup');
+
+helpButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isVisible = controlsPopup.style.display === 'block';
+    controlsPopup.style.display = isVisible ? 'none' : 'block';
+});
+
+// Close popup when clicking outside
+document.addEventListener('click', (e) => {
+    if (e.target !== helpButton && e.target !== controlsPopup && !controlsPopup.contains(e.target)) {
+        controlsPopup.style.display = 'none';
+    }
+});
+
 // Load saved skins on startup
 const savedSkins = localStorage.getItem('skins');
 if (savedSkins) {

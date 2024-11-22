@@ -10,6 +10,33 @@
             display: block;
             margin: 0 auto;
         }
+        #helpButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        #controlsPopup {
+            display: none;
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            z-index: 1000;
+        }
         body {
             background-color: #f0f0f0;
             display: flex;
@@ -25,6 +52,15 @@
     <canvas id="gameCanvas" width="400" height="600"></canvas>
     <audio id="revSound"></audio>
     <audio id="jumpSound"></audio>
+    <button id="helpButton">?</button>
+    <div id="controlsPopup">
+        <div>🎮 Game Controls:</div>
+        <div>→ or D : Move Right</div>
+        <div>← or A : Move Left</div>
+        <div>↑ or W or SPACE : Jump</div>
+        <div>S : Open/Close Shop</div>
+        <div>Any key : Activate Jetpack when ready</div>
+    </div>
     <script src="game.js"></script>
 </body>
 </html>
