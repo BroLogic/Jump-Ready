@@ -301,9 +301,9 @@ function drawPlatforms() {
 function drawScore() {
     ctx.fillStyle = 'black';
     ctx.font = '20px Arial';
-    ctx.fillText(`Score: ${score}`, 80, 30);
-    ctx.fillText(`Personal Best: ${highScore}`, 80, 60);
-    ctx.fillText(`Coins: ${coinCount}`, 80, 90);
+    ctx.fillText(`Score: ${score}`, 100, 30);
+    ctx.fillText(`Personal Best: ${highScore}`, 100, 60);
+    ctx.fillText(`Coins: ${coinCount}`, 100, 90);
     
     // Draw jetpack timer if active
     if (player.hasJetpack) {
