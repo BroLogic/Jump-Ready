@@ -859,9 +859,9 @@ function handleShopClick(event) {
     }
     
     // Check jetpack purchase
-    let currentY = 100;
+    const jetpackY = 100;
     if (jetpackPurchaseAvailable && !player.hasJetpack &&
-        y >= currentY && y <= currentY + 30 && 
+        y >= jetpackY && y <= jetpackY + 30 && 
         x >= canvas.width/2 - 100 && x <= canvas.width/2 + 100) {
         if (coinCount >= 100) {
             coinCount -= 100;
@@ -871,12 +871,13 @@ function handleShopClick(event) {
             jetpackPurchaseAvailable = false;
             localStorage.setItem('coinCount', coinCount);
         }
-        currentY += 50;
+        return;
     }
 
     // Check skin clicks
+    let skinY = jetpackPurchaseAvailable ? 150 : 100;
     Object.entries(skins).forEach(([id, skin]) => {
-        if (y >= currentY && y <= currentY + 30 && x >= canvas.width/2 - 100 && x <= canvas.width/2 + 100) {
+        if (y >= skinY && y <= skinY + 30 && x >= canvas.width/2 - 100 && x <= canvas.width/2 + 100) {
             if (skin.owned) {
                 player.currentSkin = id;
             } else if (coinCount >= skin.price) {
@@ -887,7 +888,7 @@ function handleShopClick(event) {
                 localStorage.setItem('skins', JSON.stringify(skins));
             }
         }
-        currentY += 50;
+        skinY += 50;
     });
 }
 
