@@ -186,7 +186,9 @@ for (let i = 0; i < 7; i++) {
     const platform = generatePlatform(startY - i * 100);
     platforms.push(platform);
     if (Math.random() < 0.7) { // 70% chance to spawn a coin on a platform
-        coins.push(generateCoin(platform));
+        const newCoin = generateCoin(platform);
+        newCoin.platformIndex = platforms.length - 1; // Store the platform index
+        coins.push(newCoin);
     }
 }
 
@@ -494,10 +496,25 @@ function update() {
     platforms.forEach((platform, index) => {
         // Move platform if it's a moving platform
         if (platform.isMoving) {
-            platform.x += platform.direction * platform.speed;
+            const moveAmount = platform.direction * platform.speed;
+            platform.x += moveAmount;
             if (platform.x <= 0 || platform.x + platform.width >= canvas.width) {
                 platform.direction *= -1; // Reverse direction when hitting the edge
             }
+        
+            // Move associated coins with the platform
+            coins.forEach(coin => {
+                if (coin.platformIndex === index) {
+                    coin.x += moveAmount;
+                }
+            });
+        
+            // Move associated jetpacks with the platform
+            jetpacks.forEach(jetpack => {
+                if (jetpack.platformIndex === index) {
+                    jetpack.x += moveAmount;
+                }
+            });
         }
 
         if (player.x < platform.x + platform.width &&
