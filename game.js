@@ -801,7 +801,16 @@ const touchControls = {
     right: { x: 260, y: canvas.height - 60, radius: 40 }
 };
 
+// Check if the device is mobile/tablet
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+        || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+}
+
 function addTouchControls() {
+    // Only show touch controls on mobile devices
+    if (!isMobileDevice()) return;
+
     // Left button
     ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.beginPath();
@@ -1026,6 +1035,7 @@ if (savedSkins) {
 
 // Touch event handlers
 function handleTouchStart(event) {
+    if (!isMobileDevice()) return;
     event.preventDefault();
     const rect = canvas.getBoundingClientRect();
     const touches = event.touches;
@@ -1055,12 +1065,14 @@ function handleTouchStart(event) {
 }
 
 function handleTouchEnd(event) {
+    if (!isMobileDevice()) return;
     event.preventDefault();
     player.moveLeft = false;
     player.moveRight = false;
 }
 
 function handleTouchMove(event) {
+    if (!isMobileDevice()) return;
     event.preventDefault();
 }
 
