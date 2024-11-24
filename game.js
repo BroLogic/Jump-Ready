@@ -986,7 +986,7 @@ const helpButton = {
 };
 
 const githubButton = {
-    x: canvas.width - 100,
+    x: canvas.width - 150,
     y: canvas.height - 50,
     width: 40,
     height: 40
