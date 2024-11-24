@@ -830,6 +830,16 @@ function addTouchControls() {
     // Only show touch controls on mobile devices
     if (!isMobileDevice()) return;
 
+    // Shop button
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.arc(shopButton.x + 20, shopButton.y + 20, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('🛍️', shopButton.x + 20, shopButton.y + 25);
+
     // Left button
     ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.beginPath();
@@ -1013,6 +1023,13 @@ const helpButton = {
     isPopupVisible: false
 };
 
+const shopButton = {
+    x: canvas.width - 50,
+    y: 20,
+    width: 40,
+    height: 40
+};
+
 const githubButton = {
     x: canvas.width - 100,
     y: canvas.height - 50,
@@ -1025,6 +1042,14 @@ canvas.addEventListener('click', (e) => {
     const rect = canvas.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
+
+    // Check if shop button was clicked (mobile only)
+    if (isMobileDevice() &&
+        clickX >= shopButton.x && clickX <= shopButton.x + shopButton.width &&
+        clickY >= shopButton.y && clickY <= shopButton.y + shopButton.height) {
+        shopOpen = !shopOpen;
+        return;
+    }
 
     // Check if help button was clicked
     if (clickX >= helpButton.x && clickX <= helpButton.x + helpButton.width &&
