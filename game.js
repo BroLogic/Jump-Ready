@@ -797,8 +797,8 @@ let jetpackPurchaseAvailable = true;
 // Touch control areas
 const touchControls = {
     left: { x: 60, y: canvas.height - 60, radius: 40 },
-    right: { x: 160, y: canvas.height - 60, radius: 40 },
-    jump: { x: canvas.width - 100, y: canvas.height - 60, radius: 40 }
+    jump: { x: 160, y: canvas.height - 60, radius: 40 },
+    right: { x: 260, y: canvas.height - 60, radius: 40 }
 };
 
 function addTouchControls() {
@@ -986,7 +986,7 @@ const helpButton = {
 };
 
 const githubButton = {
-    x: canvas.width - 150,
+    x: canvas.width - 100,
     y: canvas.height - 50,
     width: 40,
     height: 40
