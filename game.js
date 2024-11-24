@@ -794,6 +794,44 @@ let shopOpen = false;
 let gameStartTime = Date.now();
 let jetpackPurchaseAvailable = true;
 
+// Touch control areas
+const touchControls = {
+    left: { x: 60, y: canvas.height - 60, radius: 40 },
+    right: { x: 160, y: canvas.height - 60, radius: 40 },
+    jump: { x: canvas.width - 100, y: canvas.height - 60, radius: 40 }
+};
+
+function addTouchControls() {
+    // Left button
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.arc(touchControls.left.x, touchControls.left.y, touchControls.left.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.font = '24px Arial';
+    ctx.fillText('←', touchControls.left.x, touchControls.left.y + 10);
+
+    // Right button
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.arc(touchControls.right.x, touchControls.right.y, touchControls.right.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillText('→', touchControls.right.x, touchControls.right.y + 10);
+
+    // Jump button
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.arc(touchControls.jump.x, touchControls.jump.y, touchControls.jump.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillText('↑', touchControls.jump.x, touchControls.jump.y + 10);
+}
+
+function distance(x1, y1, x2, y2) {
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
@@ -855,6 +893,7 @@ function gameLoop() {
         });
     }
     
+    addTouchControls();
     requestAnimationFrame(gameLoop);
 }
 
@@ -984,6 +1023,51 @@ if (savedSkins) {
         }
     });
 }
+
+// Touch event handlers
+function handleTouchStart(event) {
+    event.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const touches = event.touches;
+
+    for (let i = 0; i < touches.length; i++) {
+        const touch = touches[i];
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+
+        // Check left button
+        if (distance(x, y, touchControls.left.x, touchControls.left.y) < touchControls.left.radius) {
+            player.moveLeft = true;
+        }
+        // Check right button
+        if (distance(x, y, touchControls.right.x, touchControls.right.y) < touchControls.right.radius) {
+            player.moveRight = true;
+        }
+        // Check jump button
+        if (distance(x, y, touchControls.jump.x, touchControls.jump.y) < touchControls.jump.radius) {
+            if (!player.isJumping) {
+                player.velocityY = -player.jumpForce;
+                player.isJumping = true;
+                playJumpSound();
+            }
+        }
+    }
+}
+
+function handleTouchEnd(event) {
+    event.preventDefault();
+    player.moveLeft = false;
+    player.moveRight = false;
+}
+
+function handleTouchMove(event) {
+    event.preventDefault();
+}
+
+// Add touch event listeners
+canvas.addEventListener('touchstart', handleTouchStart);
+canvas.addEventListener('touchend', handleTouchEnd);
+canvas.addEventListener('touchmove', handleTouchMove);
 
 resetGame();
 gameLoop();
