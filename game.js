@@ -576,7 +576,9 @@ function update() {
             platformsSinceLastJetpack++;
             
             if (platformsSinceLastJetpack >= 25 && platformsSinceLastJetpack <= 55 && Math.random() < 0.2) { // 20% chance within valid range
-                jetpacks.push(generateJetpack(newPlatform));
+                const newJetpack = generateJetpack(newPlatform);
+                newJetpack.platformIndex = platforms.length - 1; // Store the platform index
+                jetpacks.push(newJetpack);
                 platformsSinceLastJetpack = 0;
             } else if (Math.random() < 0.7) { // 70% chance to spawn a coin
                 coins.push(generateCoin(newPlatform));
