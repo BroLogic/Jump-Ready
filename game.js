@@ -138,15 +138,6 @@ let coins = [];
 let jetpacks = [];
 let score = 0;
 let platformsSinceLastJetpack = 0;
-let globalHighScore = 0;
-
-// Fetch initial global high score
-fetch('http://localhost:3000/highscore')
-    .then(response => response.json())
-    .then(data => {
-        globalHighScore = data.score;
-    })
-    .catch(error => console.error('Error fetching global high score:', error));
 let coinCount = parseInt(localStorage.getItem('coinCount') || 0, 10);
 let highScore = parseInt(localStorage.getItem('highScore') || 0, 10);
 
@@ -312,8 +303,7 @@ function drawScore() {
     ctx.font = '20px Arial';
     ctx.fillText(`Score: ${score}`, 80, 30);
     ctx.fillText(`Personal Best: ${highScore}`, 80, 60);
-    ctx.fillText(`Global High: ${globalHighScore}`, 80, 90);
-    ctx.fillText(`Coins: ${coinCount}`, 80, 120);
+    ctx.fillText(`Coins: ${coinCount}`, 80, 90);
     
     // Draw jetpack timer if active
     if (player.hasJetpack) {
@@ -615,22 +605,6 @@ function update() {
         if (score > highScore) {
             highScore = score;
             localStorage.setItem('highScore', highScore);
-            
-            // Update global high score if we beat it
-            fetch('http://localhost:3000/highscore', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ score: score })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    globalHighScore = data.newHighScore;
-                }
-            })
-            .catch(error => console.error('Error updating global high score:', error));
         }
         resetGame();
     }
