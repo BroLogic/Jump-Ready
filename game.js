@@ -1007,7 +1007,7 @@ document.addEventListener('keyup', (event) => {
         player.moveLeft = false;
     } else if (event.code === 'ArrowRight' || event.code === 'KeyD') {
         player.moveRight = false;
-    } else if (event.code === 'KeyS') {
+    } else if (!isMobileDevice() && event.code === 'KeyS') {
         shopOpen = !shopOpen;
     }
 });
