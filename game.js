@@ -806,6 +806,19 @@ function gameLoop() {
     drawScore();
     drawShop();
     
+    // Draw GitHub button
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.arc(githubButton.x + 20, githubButton.y + 20, 20, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Draw GitHub icon
+    ctx.fillStyle = 'white';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🐱', githubButton.x + 20, githubButton.y + 20);
+
     // Draw help button
     ctx.fillStyle = '#4a90e2';
     ctx.beginPath();
@@ -924,7 +937,7 @@ document.addEventListener('keyup', (event) => {
 
 canvas.addEventListener('click', handleShopClick);
 
-// Help button state
+// Button states
 const helpButton = {
     x: canvas.width - 50,
     y: canvas.height - 50,
@@ -933,7 +946,14 @@ const helpButton = {
     isPopupVisible: false
 };
 
-// Handle help button clicks
+const githubButton = {
+    x: canvas.width - 100,
+    y: canvas.height - 50,
+    width: 40,
+    height: 40
+};
+
+// Handle button clicks
 canvas.addEventListener('click', (e) => {
     const rect = canvas.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
@@ -945,6 +965,12 @@ canvas.addEventListener('click', (e) => {
         helpButton.isPopupVisible = !helpButton.isPopupVisible;
     } else {
         helpButton.isPopupVisible = false;
+    }
+
+    // Check if GitHub button was clicked
+    if (clickX >= githubButton.x && clickX <= githubButton.x + githubButton.width &&
+        clickY >= githubButton.y && clickY <= githubButton.y + githubButton.height) {
+        document.getElementById('githubLink').click();
     }
 });
 
