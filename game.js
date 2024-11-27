@@ -171,12 +171,14 @@ function generatePlatform(y, isStarting = false) {
 }
 
 function generateCoin(platform) {
+    const isBlue = Math.random() < 0.1; // 10% chance for blue coin
     return {
         x: platform.x + platform.width / 2 - 10, // Center the coin above the platform
         y: platform.y - player.height - 20, // Place the coin one player height above the platform, with a larger gap
         width: 20,
         height: 20,
-        collected: false
+        collected: false,
+        type: isBlue ? 'blue' : 'regular'
     };
 }
 
@@ -325,30 +327,41 @@ function drawCoins() {
             const centerY = coin.y + coin.height / 2;
             const radius = coin.width / 2;
 
-            // Outer circle (gold rim)
+            // Colors based on coin type
+            const colors = coin.type === 'blue' ? {
+                outer: '#4169E1',    // Royal Blue
+                inner: '#6495ED',    // Cornflower Blue
+                highlight: '#87CEFA' // Light Sky Blue
+            } : {
+                outer: '#FFD700',    // Gold
+                inner: '#FFDF00',    // Yellow
+                highlight: '#FFF68F' // Light Yellow
+            };
+
+            // Outer circle
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#FFD700';
+            ctx.fillStyle = colors.outer;
             ctx.fill();
 
-            // Inner circle (lighter gold)
+            // Inner circle
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius * 0.8, 0, Math.PI * 2);
-            ctx.fillStyle = '#FFDF00';
+            ctx.fillStyle = colors.inner;
             ctx.fill();
 
             // Highlight
             ctx.beginPath();
             ctx.arc(centerX - radius * 0.2, centerY - radius * 0.2, radius * 0.6, 0, Math.PI * 2);
-            ctx.fillStyle = '#FFF68F';
+            ctx.fillStyle = colors.highlight;
             ctx.fill();
 
-            // '?' symbol
-            ctx.fillStyle = '#FFD700';
+            // Symbol
+            ctx.fillStyle = colors.outer;
             ctx.font = `bold ${radius * 1.2}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('?', centerX, centerY);
+            ctx.fillText(coin.type === 'blue' ? '10' : '?', centerX, centerY);
         }
     });
 }
@@ -598,7 +611,7 @@ function update() {
             player.y < coin.y + coin.height &&
             player.y + player.height > coin.y) {
             coin.collected = true;
-            coinCount++;
+            coinCount += coin.type === 'blue' ? 10 : 1;
             localStorage.setItem('coinCount', coinCount);
         }
     });
