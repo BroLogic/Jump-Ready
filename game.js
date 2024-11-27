@@ -502,19 +502,6 @@ function update() {
                 platform.direction *= -1; // Reverse direction when hitting the edge
             }
         
-            // Move associated coins with the platform
-            coins.forEach(coin => {
-                if (coin.platformIndex === index) {
-                    coin.x += moveAmount;
-                }
-            });
-        
-            // Move associated jetpacks with the platform
-            jetpacks.forEach(jetpack => {
-                if (jetpack.platformIndex === index) {
-                    jetpack.x += moveAmount;
-                }
-            });
         }
 
         if (player.x < platform.x + platform.width &&
