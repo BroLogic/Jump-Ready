@@ -152,22 +152,45 @@ function generateJetpack(platform) {
 }
 
 function generatePlatform(y, isStarting = false) {
-    const minWidth = Math.max(30, 100 - score / 100); // Platform width decreases as score increases
+    const minWidth = Math.max(30, 100 - score / 100);
     const width = minWidth + Math.random() * (100 - minWidth);
-    const isShortcut = !isStarting && Math.random() < 0.1; // 10% chance for a shortcut platform
+    const isShortcut = !isStarting && Math.random() < 0.1;
+    
+    // Platform type probabilities (only for non-starting platforms)
+    let platformType = 'normal';
+    if (!isStarting) {
+        const rand = Math.random();
+        if (rand < 0.15) platformType = 'iceberg';
+        else if (rand < 0.25) platformType = 'bouncy';
+        else if (rand < 0.35) platformType = 'spiky';
+    }
+    
     return {
         x: Math.random() * (canvas.width - width),
         y: y,
         width: width,
         height: 20,
-        isMoving: !isShortcut && Math.random() < 0.25, // 25% chance for horizontal movement
-        direction: 1, // 1 for right/up, -1 for left/down
-        speed: 1 + Math.random() * 2, // Random speed between 1 and 3
-        isCrumbling: !isStarting && !isShortcut && Math.random() < 0.25, // 25% chance for regular platforms to crumble
-        isShortcut: isShortcut, // Flag for shortcut platforms
+        isMoving: !isShortcut && Math.random() < 0.25,
+        direction: 1,
+        speed: 1 + Math.random() * 2,
+        isCrumbling: !isStarting && !isShortcut && Math.random() < 0.25,
+        isShortcut: isShortcut,
         crumbleTimer: 0,
-        color: isShortcut ? '#e74c3c' : '#2ecc71' // Red for shortcuts, green for regular
+        type: platformType,
+        bounceForce: platformType === 'bouncy' ? 35 : 0,
+        color: getPlatformColor(platformType, isShortcut)
     };
+}
+
+function getPlatformColor(type, isShortcut) {
+    if (isShortcut) return '#e74c3c';
+    switch (type) {
+        case 'iceberg': return '#A5F2F3';
+        case 'bouncy': return '#FFA500';
+        case 'spiky': return '#8B0000';
+        default: return '#2ecc71';
+    }
+}
 }
 
 function generateCoin(platform) {
@@ -297,9 +320,66 @@ function drawShop() {
 
 function drawPlatforms() {
     platforms.forEach(platform => {
+        // Base platform
         ctx.fillStyle = platform.isCrumbling ? '#8e44ad' : platform.color;
         ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+        
+        // Special platform features
+        switch (platform.type) {
+            case 'iceberg':
+                drawIcebergSpikes(platform);
+                break;
+            case 'bouncy':
+                drawBouncyPlatform(platform);
+                break;
+            case 'spiky':
+                drawSpikes(platform);
+                break;
+        }
     });
+}
+
+function drawIcebergSpikes(platform) {
+    ctx.fillStyle = '#E0FFFF';
+    const spikeHeight = 15;
+    const numSpikes = Math.floor(platform.width / 20);
+    for (let i = 0; i < numSpikes; i++) {
+        const x = platform.x + (i * platform.width / numSpikes);
+        ctx.beginPath();
+        ctx.moveTo(x, platform.y);
+        ctx.lineTo(x + platform.width / numSpikes / 2, platform.y - spikeHeight);
+        ctx.lineTo(x + platform.width / numSpikes, platform.y);
+        ctx.fill();
+    }
+}
+
+function drawBouncyPlatform(platform) {
+    // Spring coils
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 3;
+    const coilWidth = 10;
+    const numCoils = Math.floor(platform.width / 20);
+    for (let i = 0; i < numCoils; i++) {
+        const x = platform.x + (i * platform.width / numCoils) + coilWidth;
+        ctx.beginPath();
+        ctx.moveTo(x, platform.y);
+        ctx.lineTo(x, platform.y + platform.height);
+        ctx.stroke();
+    }
+}
+
+function drawSpikes(platform) {
+    ctx.fillStyle = '#FF0000';
+    const spikeHeight = 15;
+    const numSpikes = Math.floor(platform.width / 15);
+    for (let i = 0; i < numSpikes; i++) {
+        const x = platform.x + (i * platform.width / numSpikes);
+        ctx.beginPath();
+        ctx.moveTo(x, platform.y);
+        ctx.lineTo(x + platform.width / numSpikes / 2, platform.y - spikeHeight);
+        ctx.lineTo(x + platform.width / numSpikes, platform.y);
+        ctx.fill();
+    }
 }
 
 function drawScore() {
@@ -529,9 +609,28 @@ function update() {
             
             // Collision from above
             if (player.velocityY > 0 && player.y + player.height - player.velocityY <= platform.y) {
+                // Check for spiky platform collision from above
+                if (platform.type === 'spiky') {
+                    resetGame();
+                    return;
+                }
+                
                 player.isJumping = false;
                 player.y = platform.y - player.height;
-                player.velocityY = 0;
+                
+                // Handle bouncy platforms
+                if (platform.type === 'bouncy') {
+                    player.velocityY = -platform.bounceForce;
+                    playJumpSound();
+                } else {
+                    player.velocityY = 0;
+                }
+                
+                // Handle iceberg physics (slippery)
+                if (platform.type === 'iceberg') {
+                    if (player.moveLeft) player.x -= player.speed * 1.5;
+                    if (player.moveRight) player.x += player.speed * 1.5;
+                }
                 
                 // Move player with the platform if it's moving horizontally
                 if (platform.isMoving) {
@@ -541,9 +640,9 @@ function update() {
                 // Handle crumbling and shortcut platforms
                 if (platform.isCrumbling || platform.isShortcut) {
                     platform.crumbleTimer++;
-                    const timeout = platform.isShortcut ? 60 : 60; // 1 second for both types
+                    const timeout = platform.isShortcut ? 60 : 60;
                     if (platform.crumbleTimer > timeout) {
-                        platforms.splice(index, 1); // Remove the platform
+                        platforms.splice(index, 1);
                     }
                 }
             }
