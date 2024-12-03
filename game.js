@@ -494,6 +494,11 @@ function update() {
             player.jetpackReady = true;
             player.hasJetpack = false;
             player.jetpackTimer = 0;
+            // Add lightning effect at jetpack position
+            lightningEffects.push(createLightningEffect(
+                jetpack.x + jetpack.width/2,
+                jetpack.y + jetpack.height/2
+            ));
         }
     });
 
@@ -616,6 +621,11 @@ function update() {
             coin.collected = true;
             coinCount += coin.type === 'blue' ? 10 : 1;
             localStorage.setItem('coinCount', coinCount);
+            // Add lightning effect at coin position
+            lightningEffects.push(createLightningEffect(
+                coin.x + coin.width/2,
+                coin.y + coin.height/2
+            ));
         }
     });
 
@@ -754,6 +764,55 @@ function drawMilkyWay(y) {
     ctx.fillRect(0, y - canvas.width/2, canvas.width, canvas.width);
 }
 
+function createLightningEffect(x, y) {
+    return {
+        x: x,
+        y: y,
+        segments: [],
+        age: 0,
+        maxAge: 10,
+        generate: function() {
+            this.segments = [];
+            let currentX = this.x;
+            let currentY = this.y;
+            for (let i = 0; i < 3; i++) {
+                const endX = currentX + (Math.random() * 40 - 20);
+                const endY = currentY + (Math.random() * 20 + 10);
+                this.segments.push({
+                    x1: currentX,
+                    y1: currentY,
+                    x2: endX,
+                    y2: endY
+                });
+                currentX = endX;
+                currentY = endY;
+            }
+        }
+    };
+}
+
+let lightningEffects = [];
+
+function drawLightningEffects() {
+    lightningEffects = lightningEffects.filter(effect => {
+        if (effect.age === 0) {
+            effect.generate();
+        }
+        
+        effect.segments.forEach(segment => {
+            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - effect.age / effect.maxAge})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(segment.x1, segment.y1);
+            ctx.lineTo(segment.x2, segment.y2);
+            ctx.stroke();
+        });
+        
+        effect.age++;
+        return effect.age < effect.maxAge;
+    });
+}
+
 function drawBackground() {
     // Calculate how dark the sky should be based on score
     const darkness = Math.min(0.8, score / 10000); // Max darkness of 0.8
@@ -877,6 +936,7 @@ function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
     update();
+    drawLightningEffects();
     drawPlatforms();
     drawCoins();
     drawJetpacks();
