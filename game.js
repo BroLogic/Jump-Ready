@@ -173,7 +173,7 @@ function generatePlatform(y, isStarting = false) {
             const rand = Math.random();
             if (rand < 0.15) platformType = 'iceberg';
             else if (rand < 0.25) platformType = 'bouncy';
-            else if (rand < 0.35) platformType = 'spiky';
+            else if (rand < 0.35 && platforms[platforms.length-1].type === 'normal') platformType = 'spiky';
         }
     }
     
