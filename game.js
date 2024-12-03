@@ -120,7 +120,7 @@ const player = {
     width: 30,
     height: 30,
     speed: 5,
-    jumpForce: 22,
+    jumpForce: 28,
     velocityY: 0,
     isJumping: false,
     moveLeft: false,
