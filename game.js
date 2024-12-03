@@ -119,7 +119,7 @@ const player = {
     y: 300,
     width: 30,
     height: 30,
-    speed: 5,
+    speed: 8,
     jumpForce: 28,
     velocityY: 0,
     isJumping: false,
