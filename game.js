@@ -479,7 +479,7 @@ function update() {
 
     // Apply gravity if not using jetpack
     if (!player.hasJetpack) {
-        player.velocityY += 1.2;
+        player.velocityY += 2.0;
     }
     player.y += player.velocityY;
 
