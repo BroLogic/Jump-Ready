@@ -621,11 +621,6 @@ function update() {
             coin.collected = true;
             coinCount += coin.type === 'blue' ? 10 : 1;
             localStorage.setItem('coinCount', coinCount);
-            // Add lightning effect at coin position
-            lightningEffects.push(createLightningEffect(
-                coin.x + coin.width/2,
-                coin.y + coin.height/2
-            ));
         }
     });
 
