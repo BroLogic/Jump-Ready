@@ -160,10 +160,21 @@ function generatePlatform(y, isStarting = false) {
     // Platform type probabilities (only for non-starting platforms)
     let platformType = 'normal';
     if (!isStarting) {
-        const rand = Math.random();
-        if (rand < 0.15) platformType = 'iceberg';
-        else if (rand < 0.25) platformType = 'bouncy';
-        else if (rand < 0.35) platformType = 'spiky';
+        // Generate a safe platform at least every third platform
+        if (platforms.length >= 2 && 
+            platforms[platforms.length-1].type === 'spiky' && 
+            platforms[platforms.length-2].type === 'spiky') {
+            // Force a safe platform
+            const rand = Math.random();
+            if (rand < 0.5) platformType = 'normal';
+            else if (rand < 0.75) platformType = 'iceberg';
+            else platformType = 'bouncy';
+        } else {
+            const rand = Math.random();
+            if (rand < 0.15) platformType = 'iceberg';
+            else if (rand < 0.25) platformType = 'bouncy';
+            else if (rand < 0.35) platformType = 'spiky';
+        }
     }
     
     return {
