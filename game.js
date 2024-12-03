@@ -120,7 +120,7 @@ const player = {
     width: 30,
     height: 30,
     speed: 5,
-    jumpForce: 17,
+    jumpForce: 22,
     velocityY: 0,
     isJumping: false,
     moveLeft: false,
@@ -479,7 +479,7 @@ function update() {
 
     // Apply gravity if not using jetpack
     if (!player.hasJetpack) {
-        player.velocityY += 0.8;
+        player.velocityY += 1.2;
     }
     player.y += player.velocityY;
 
