@@ -171,9 +171,7 @@ function generatePlatform(y, isStarting = false) {
             else platformType = 'bouncy';
         } else {
             const rand = Math.random();
-            if (rand < 0.15) platformType = 'iceberg';
-            else if (rand < 0.25) platformType = 'bouncy';
-            else if (rand < 0.35 && platforms[platforms.length-1].type === 'normal') platformType = 'spiky';
+            if (rand < 0.25) platformType = 'bouncy';
         }
     }
     
@@ -197,9 +195,7 @@ function generatePlatform(y, isStarting = false) {
 function getPlatformColor(type, isShortcut) {
     if (isShortcut) return '#e74c3c';
     switch (type) {
-        case 'iceberg': return '#A5F2F3';
         case 'bouncy': return '#FFA500';
-        case 'spiky': return '#8B0000';
         default: return '#2ecc71';
     }
 }
@@ -337,32 +333,13 @@ function drawPlatforms() {
         
         // Special platform features
         switch (platform.type) {
-            case 'iceberg':
-                drawIcebergSpikes(platform);
-                break;
             case 'bouncy':
                 drawBouncyPlatform(platform);
-                break;
-            case 'spiky':
-                drawSpikes(platform);
                 break;
         }
     });
 }
 
-function drawIcebergSpikes(platform) {
-    ctx.fillStyle = '#E0FFFF';
-    const spikeHeight = 15;
-    const numSpikes = Math.floor(platform.width / 20);
-    for (let i = 0; i < numSpikes; i++) {
-        const x = platform.x + (i * platform.width / numSpikes);
-        ctx.beginPath();
-        ctx.moveTo(x, platform.y);
-        ctx.lineTo(x + platform.width / numSpikes / 2, platform.y - spikeHeight);
-        ctx.lineTo(x + platform.width / numSpikes, platform.y);
-        ctx.fill();
-    }
-}
 
 function drawBouncyPlatform(platform) {
     // Spring coils
@@ -379,19 +356,6 @@ function drawBouncyPlatform(platform) {
     }
 }
 
-function drawSpikes(platform) {
-    ctx.fillStyle = '#FF0000';
-    const spikeHeight = 15;
-    const numSpikes = Math.floor(platform.width / 15);
-    for (let i = 0; i < numSpikes; i++) {
-        const x = platform.x + (i * platform.width / numSpikes);
-        ctx.beginPath();
-        ctx.moveTo(x, platform.y);
-        ctx.lineTo(x + platform.width / numSpikes / 2, platform.y - spikeHeight);
-        ctx.lineTo(x + platform.width / numSpikes, platform.y);
-        ctx.fill();
-    }
-}
 
 function drawScore() {
     ctx.fillStyle = 'black';
