@@ -136,6 +136,7 @@ const player = {
 let platforms = [];
 let coins = [];
 let jetpacks = [];
+let spikes = [];
 let score = 0;
 let platformsSinceLastJetpack = 0;
 let coinCount = parseInt(localStorage.getItem('coinCount') || 0, 10);
