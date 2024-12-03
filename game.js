@@ -765,22 +765,27 @@ function createLightningEffect(x, y) {
         y: y,
         segments: [],
         age: 0,
-        maxAge: 10,
+        maxAge: 15,
         generate: function() {
             this.segments = [];
-            let currentX = this.x;
-            let currentY = this.y;
-            for (let i = 0; i < 3; i++) {
-                const endX = currentX + (Math.random() * 40 - 20);
-                const endY = currentY + (Math.random() * 20 + 10);
-                this.segments.push({
-                    x1: currentX,
-                    y1: currentY,
-                    x2: endX,
-                    y2: endY
-                });
-                currentX = endX;
-                currentY = endY;
+            // Create multiple lightning bolts across the screen
+            for (let j = 0; j < 5; j++) {
+                let currentX = Math.random() * canvas.width;
+                let currentY = 0;
+                const segments = [];
+                for (let i = 0; i < 8; i++) {
+                    const endX = currentX + (Math.random() * 100 - 50);
+                    const endY = currentY + canvas.height / 8;
+                    segments.push({
+                        x1: currentX,
+                        y1: currentY,
+                        x2: endX,
+                        y2: endY
+                    });
+                    currentX = endX;
+                    currentY = endY;
+                }
+                this.segments.push(...segments);
             }
         }
     };
@@ -794,9 +799,14 @@ function drawLightningEffects() {
             effect.generate();
         }
         
+        // Create a full-screen flash
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 * (1 - effect.age / effect.maxAge)})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw lightning bolts
         effect.segments.forEach(segment => {
             ctx.strokeStyle = `rgba(255, 255, 255, ${1 - effect.age / effect.maxAge})`;
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.beginPath();
             ctx.moveTo(segment.x1, segment.y1);
             ctx.lineTo(segment.x2, segment.y2);
