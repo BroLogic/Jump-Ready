@@ -192,7 +192,6 @@ function getPlatformColor(type, isShortcut) {
         default: return '#2ecc71';
     }
 }
-}
 
 function generateCoin(platform) {
     const isBlue = Math.random() < 0.1; // 10% chance for blue coin
