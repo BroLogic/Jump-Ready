@@ -592,13 +592,16 @@ function update() {
             // Add coin or jetpack
             platformsSinceLastJetpack++;
             
-            if (platformsSinceLastJetpack >= 25 && platformsSinceLastJetpack <= 55 && Math.random() < 0.2) { // 20% chance within valid range
-                const newJetpack = generateJetpack(newPlatform);
-                newJetpack.platformIndex = platforms.length - 1; // Store the platform index
-                jetpacks.push(newJetpack);
-                platformsSinceLastJetpack = 0;
-            } else if (Math.random() < 0.7) { // 70% chance to spawn a coin
-                coins.push(generateCoin(newPlatform));
+            // Only spawn items on non-moving platforms
+            if (!newPlatform.isMoving) {
+                if (platformsSinceLastJetpack >= 25 && platformsSinceLastJetpack <= 55 && Math.random() < 0.2) { // 20% chance within valid range
+                    const newJetpack = generateJetpack(newPlatform);
+                    newJetpack.platformIndex = platforms.length - 1; // Store the platform index
+                    jetpacks.push(newJetpack);
+                    platformsSinceLastJetpack = 0;
+                } else if (Math.random() < 0.7) { // 70% chance to spawn a coin
+                    coins.push(generateCoin(newPlatform));
+                }
             }
         }
     }
