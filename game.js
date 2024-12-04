@@ -119,7 +119,7 @@ const player = {
     y: 300,
     width: 30,
     height: 30,
-    baseSpeed: 1, // Base movement speed
+    baseSpeed: 4, // Base movement speed
     maxSpeed: 15, // Maximum movement speed 
     jumpForce: 28,
     velocityY: 0,
