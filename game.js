@@ -1,6 +1,11 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Track key states
+const keys = {
+    q: false
+};
+
 // Sound elements
 const revSound = document.getElementById('revSound');
 const jumpSound = document.getElementById('jumpSound');
@@ -524,10 +529,13 @@ function drawRainbowParticle(point) {
 function update() {
     // Handle jetpack physics and timer
     if (player.hasJetpack) {
-        player.jetpackTimer++;
-        if (player.jetpackTimer >= player.jetpackDuration) {
-            player.hasJetpack = false;
-            player.jetpackTimer = 0;
+        // Only increment timer if not using Q key infinite jetpack
+        if (keys.q !== true) {
+            player.jetpackTimer++;
+            if (player.jetpackTimer >= player.jetpackDuration) {
+                player.hasJetpack = false;
+                player.jetpackTimer = 0;
+            }
         }
         player.velocityY = -8; // Constant upward force
     }
@@ -1129,8 +1137,13 @@ function handleShopClick(event) {
 }
 
 document.addEventListener('keydown', (event) => {
+    // Q key gives infinite jetpack
+    if (event.code === 'KeyQ') {
+        player.hasJetpack = true;
+        player.jetpackTimer = 0; // Reset timer to keep jetpack going
+    }
     // Activate jetpack on any key press if it's ready
-    if (player.jetpackReady) {
+    else if (player.jetpackReady) {
         player.hasJetpack = true;
         player.jetpackReady = false;
     }
@@ -1155,6 +1168,9 @@ document.addEventListener('keyup', (event) => {
         player.moveRight = false;
     } else if (!isMobileDevice() && event.code === 'KeyS') {
         shopOpen = !shopOpen;
+    } else if (event.code === 'KeyQ') {
+        keys.q = false;
+        player.hasJetpack = false;
     }
 });
 
