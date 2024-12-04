@@ -119,7 +119,8 @@ const player = {
     y: 300,
     width: 30,
     height: 30,
-    speed: 8,
+    baseSpeed: 8, // Base movement speed
+    maxSpeed: 20, // Maximum movement speed
     jumpForce: 28,
     velocityY: 0,
     isJumping: false,
@@ -557,12 +558,16 @@ function update() {
         }
     });
 
-    // Handle player movement
+    // Calculate current speed based on score
+    const speedIncrease = Math.min(score / 1000, player.maxSpeed - player.baseSpeed);
+    const currentSpeed = player.baseSpeed + speedIncrease;
+
+    // Handle player movement with dynamic speed
     if (player.moveLeft) {
-        player.x -= player.speed;
+        player.x -= currentSpeed;
     }
     if (player.moveRight) {
-        player.x += player.speed;
+        player.x += currentSpeed;
     }
 
     // Update and check for collision with platforms
