@@ -2,9 +2,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 // Track key states
-const keys = {
-    q: false
-};
+const keys = {};
 
 // Sound elements
 const revSound = document.getElementById('revSound');
@@ -529,18 +527,12 @@ function drawRainbowParticle(point) {
 function update() {
     // Handle jetpack physics and timer
     if (player.hasJetpack) {
-        if (keys.q) {
-            // Q key jetpack is active while held
-            player.velocityY = -8;
-        } else {
-            // Normal jetpack with timer
-            player.jetpackTimer++;
-            if (player.jetpackTimer >= player.jetpackDuration) {
-                player.hasJetpack = false;
-                player.jetpackTimer = 0;
-            }
-            player.velocityY = -8;
+        player.jetpackTimer++;
+        if (player.jetpackTimer >= player.jetpackDuration) {
+            player.hasJetpack = false;
+            player.jetpackTimer = 0;
         }
+        player.velocityY = -8;
     }
 
     // Apply gravity if not using jetpack
@@ -1140,11 +1132,6 @@ function handleShopClick(event) {
 }
 
 document.addEventListener('keydown', (event) => {
-    // Q key activates jetpack while held
-    if (event.code === 'KeyQ') {
-        keys.q = true;
-        player.hasJetpack = true;
-    }
     // Activate jetpack on any key press if it's ready
     else if (player.jetpackReady) {
         player.hasJetpack = true;
@@ -1171,9 +1158,6 @@ document.addEventListener('keyup', (event) => {
         player.moveRight = false;
     } else if (!isMobileDevice() && event.code === 'KeyS') {
         shopOpen = !shopOpen;
-    } else if (event.code === 'KeyQ') {
-        keys.q = false;
-        player.hasJetpack = false;
     }
 });
 
