@@ -1133,7 +1133,7 @@ function handleShopClick(event) {
 
 document.addEventListener('keydown', (event) => {
     // Activate jetpack on any key press if it's ready
-    else if (player.jetpackReady) {
+    if (player.jetpackReady) {
         player.hasJetpack = true;
         player.jetpackReady = false;
     }
