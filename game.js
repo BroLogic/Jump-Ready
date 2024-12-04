@@ -529,15 +529,18 @@ function drawRainbowParticle(point) {
 function update() {
     // Handle jetpack physics and timer
     if (player.hasJetpack) {
-        // Only increment timer if not using Q key infinite jetpack
-        if (keys.q !== true) {
+        if (keys.q) {
+            // Q key jetpack is active while held
+            player.velocityY = -8;
+        } else {
+            // Normal jetpack with timer
             player.jetpackTimer++;
             if (player.jetpackTimer >= player.jetpackDuration) {
                 player.hasJetpack = false;
                 player.jetpackTimer = 0;
             }
+            player.velocityY = -8;
         }
-        player.velocityY = -8; // Constant upward force
     }
 
     // Apply gravity if not using jetpack
@@ -1137,10 +1140,10 @@ function handleShopClick(event) {
 }
 
 document.addEventListener('keydown', (event) => {
-    // Q key gives infinite jetpack
+    // Q key activates jetpack while held
     if (event.code === 'KeyQ') {
+        keys.q = true;
         player.hasJetpack = true;
-        player.jetpackTimer = 0; // Reset timer to keep jetpack going
     }
     // Activate jetpack on any key press if it's ready
     else if (player.jetpackReady) {
