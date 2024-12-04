@@ -120,7 +120,6 @@ const player = {
     width: 30,
     height: 30,
     baseSpeed: 4, // Base movement speed
-    maxSpeed: 15, // Maximum movement speed 
     jumpForce: 28,
     velocityY: 0,
     isJumping: false,
@@ -558,8 +557,8 @@ function update() {
         }
     });
 
-    // Calculate current speed based on score (faster scaling since we start slower)
-    const speedIncrease = Math.min(score / 500, player.maxSpeed - player.baseSpeed);
+    // Calculate current speed based on score (no maximum speed)
+    const speedIncrease = score / 500;
     const currentSpeed = player.baseSpeed + speedIncrease;
 
     // Handle player movement with dynamic speed
