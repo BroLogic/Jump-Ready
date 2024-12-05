@@ -190,7 +190,7 @@ function generatePlatform(y, isStarting = false) {
         isShortcut: isShortcut,
         crumbleTimer: 0,
         type: platformType,
-        bounceForce: platformType === 'bouncy' ? 35 : 0,
+        bounceForce: platformType === 'bouncy' ? 20 : 0,
         color: getPlatformColor(platformType, isShortcut)
     };
 }
