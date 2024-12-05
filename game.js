@@ -122,6 +122,9 @@ const player = {
     y: 300,
     width: 30,
     height: 30,
+    isInvincible: false,
+    invincibilityTimer: 0,
+    invincibilityDuration: 300, // 5 seconds at 60fps
     baseSpeed: 4, // Base movement speed
     jumpForce: 28,
     velocityY: 0,
@@ -141,6 +144,7 @@ let coins = [];
 let jetpacks = [];
 let spikes = [];
 let meteors = [];
+let powerups = [];
 let score = 0;
 let platformsSinceLastJetpack = 0;
 let coinCount = parseInt(localStorage.getItem('coinCount') || 0, 10);
@@ -228,7 +232,41 @@ for (let i = 0; i < 7; i++) {
     }
 }
 
+function drawPowerups() {
+    powerups.forEach(powerup => {
+        if (!powerup.collected) {
+            // Draw star shape
+            ctx.save();
+            ctx.translate(powerup.x + powerup.width/2, powerup.y + powerup.height/2);
+            ctx.rotate(Date.now() / 1000);
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI) / 5;
+                const x = Math.cos(angle) * powerup.width/2;
+                const y = Math.sin(angle) * powerup.height/2;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.restore();
+        }
+    });
+}
+
 function drawPlayer() {
+    // Add rainbow effect when invincible
+    if (player.isInvincible) {
+        ctx.save();
+        ctx.globalAlpha = 0.5;
+        ctx.strokeStyle = `hsl(${Date.now() % 360}, 100%, 50%)`;
+        ctx.lineWidth = 4;
+        ctx.strokeRect(player.x - 2, player.y - 2, player.width + 4, player.height + 4);
+        ctx.restore();
+    }
+
     // Draw jetpack if active
     if (player.hasJetpack) {
         // Jetpack body
@@ -536,7 +574,27 @@ function createMeteor() {
     };
 }
 
+function generatePowerup(platform) {
+    return {
+        x: platform.x + platform.width / 2 - 15,
+        y: platform.y - 30,
+        width: 30,
+        height: 30,
+        collected: false,
+        type: 'invincibility'
+    };
+}
+
 function update() {
+    // Update invincibility
+    if (player.isInvincible) {
+        player.invincibilityTimer++;
+        if (player.invincibilityTimer >= player.invincibilityDuration) {
+            player.isInvincible = false;
+            player.invincibilityTimer = 0;
+        }
+    }
+
     // Spawn meteors based on score
     if (score > 2000 && Math.random() < 0.002 + (score / 100000)) {
         meteors.push(createMeteor());
@@ -552,7 +610,7 @@ function update() {
         const dy = (player.y + player.height/2) - (meteor.y + meteor.size/2);
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        if (distance < (player.width/2 + meteor.size/2)) {
+        if (distance < (player.width/2 + meteor.size/2) && !player.isInvincible) {
             resetGame();
             return;
         }
@@ -724,7 +782,11 @@ function update() {
                     jetpacks.push(newJetpack);
                     platformsSinceLastJetpack = 0;
                 } else if (Math.random() < 0.7) { // 70% chance to spawn a coin
-                    coins.push(generateCoin(newPlatform));
+                    if (Math.random() < 0.1) { // 10% chance for powerup instead of coin
+                        powerups.push(generatePowerup(newPlatform));
+                    } else {
+                        coins.push(generateCoin(newPlatform));
+                    }
                 }
             }
         }
@@ -768,6 +830,7 @@ function resetGame() {
     coins.length = 0;
     jetpacks.length = 0;
     meteors.length = 0;
+    powerups.length = 0;
     gameStartTime = Date.now();
     if (!player.hasJetpack) {
         jetpackPurchaseAvailable = true;
@@ -1100,6 +1163,7 @@ function gameLoop() {
     drawCoins();
     drawJetpacks();
     drawTrail();
+    drawPowerups();
     drawPlayer();
     drawScore();
     drawShop();
