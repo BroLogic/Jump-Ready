@@ -140,6 +140,7 @@ let platforms = [];
 let coins = [];
 let jetpacks = [];
 let spikes = [];
+let meteors = [];
 let score = 0;
 let platformsSinceLastJetpack = 0;
 let coinCount = parseInt(localStorage.getItem('coinCount') || 0, 10);
@@ -524,7 +525,44 @@ function drawRainbowParticle(point) {
 }
 
 
+function createMeteor() {
+    return {
+        x: Math.random() * canvas.width,
+        y: -30,
+        size: 20 + Math.random() * 20,
+        speed: 5 + Math.random() * 3,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.2
+    };
+}
+
 function update() {
+    // Spawn meteors based on score
+    if (score > 1000 && Math.random() < 0.01 + (score / 20000)) {
+        meteors.push(createMeteor());
+    }
+
+    // Update meteors
+    meteors.forEach((meteor, index) => {
+        meteor.y += meteor.speed;
+        meteor.rotation += meteor.rotationSpeed;
+        
+        // Check collision with player
+        const dx = (player.x + player.width/2) - (meteor.x + meteor.size/2);
+        const dy = (player.y + player.height/2) - (meteor.y + meteor.size/2);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < (player.width/2 + meteor.size/2)) {
+            resetGame();
+            return;
+        }
+        
+        // Remove meteors that are off screen
+        if (meteor.y > canvas.height) {
+            meteors.splice(index, 1);
+        }
+    });
+
     // Handle jetpack physics and timer
     if (player.hasJetpack) {
         player.jetpackTimer++;
@@ -729,6 +767,7 @@ function resetGame() {
     platforms.length = 0;
     coins.length = 0;
     jetpacks.length = 0;
+    meteors.length = 0;
     gameStartTime = Date.now();
     if (!player.hasJetpack) {
         jetpackPurchaseAvailable = true;
@@ -897,6 +936,40 @@ function drawLightningEffects() {
         effect.age++;
         return effect.age < effect.maxAge;
     });
+}
+
+function drawMeteor(meteor) {
+    ctx.save();
+    ctx.translate(meteor.x + meteor.size/2, meteor.y + meteor.size/2);
+    ctx.rotate(meteor.rotation);
+    
+    // Draw meteor body
+    ctx.fillStyle = '#ff4400';
+    ctx.beginPath();
+    ctx.arc(0, 0, meteor.size/2, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Draw crater details
+    ctx.fillStyle = '#cc3300';
+    for (let i = 0; i < 3; i++) {
+        const angle = (i * Math.PI * 2) / 3;
+        const craterX = Math.cos(angle) * meteor.size/4;
+        const craterY = Math.sin(angle) * meteor.size/4;
+        ctx.beginPath();
+        ctx.arc(craterX, craterY, meteor.size/6, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    // Draw fire trail
+    ctx.fillStyle = 'rgba(255, 100, 0, 0.5)';
+    ctx.beginPath();
+    ctx.moveTo(-meteor.size/2, meteor.size/2);
+    ctx.lineTo(0, meteor.size * 1.5);
+    ctx.lineTo(meteor.size/2, meteor.size/2);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.restore();
 }
 
 function drawBackground() {
@@ -1079,6 +1152,9 @@ function gameLoop() {
             ctx.fillText(text, helpButton.x - 150, helpButton.y - 130 + (i * 22));
         });
     }
+    
+    // Draw meteors
+    meteors.forEach(meteor => drawMeteor(meteor));
     
     addTouchControls();
     requestAnimationFrame(gameLoop);
