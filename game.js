@@ -781,11 +781,13 @@ function update() {
                     newJetpack.platformIndex = platforms.length - 1; // Store the platform index
                     jetpacks.push(newJetpack);
                     platformsSinceLastJetpack = 0;
-                } else if (Math.random() < 0.7) { // 70% chance to spawn a coin
-                    if (Math.random() < 0.1) { // 10% chance for powerup instead of coin
-                        powerups.push(generatePowerup(newPlatform));
+                } else if (Math.random() < 0.7) { // 70% chance to spawn a coin or powerup
+                    if (Math.random() < 0.15) { // 15% chance for powerup instead of coin
+                        const powerup = generatePowerup(newPlatform);
+                        powerups.push(powerup);
                     } else {
-                        coins.push(generateCoin(newPlatform));
+                        const coin = generateCoin(newPlatform);
+                        coins.push(coin);
                     }
                 }
             }
