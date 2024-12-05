@@ -238,14 +238,34 @@ function drawPowerups() {
             // Draw star shape
             ctx.save();
             ctx.translate(powerup.x + powerup.width/2, powerup.y + powerup.height/2);
-            ctx.rotate(Date.now() / 1000);
             
+            // Rotate star
+            powerup.rotation = (powerup.rotation || 0) + 0.05;
+            ctx.rotate(powerup.rotation);
+            
+            // Draw outer glow
+            ctx.shadowColor = '#FFD700';
+            ctx.shadowBlur = 15;
+            
+            // Draw larger star
             ctx.fillStyle = '#FFD700';
             ctx.beginPath();
             for (let i = 0; i < 5; i++) {
                 const angle = (i * 4 * Math.PI) / 5;
                 const x = Math.cos(angle) * powerup.width/2;
                 const y = Math.sin(angle) * powerup.height/2;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw inner star
+            ctx.fillStyle = '#FFF';
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI) / 5;
+                const x = Math.cos(angle) * powerup.width/4;
+                const y = Math.sin(angle) * powerup.height/4;
                 i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
             }
             ctx.closePath();
@@ -576,12 +596,13 @@ function createMeteor() {
 
 function generatePowerup(platform) {
     return {
-        x: platform.x + platform.width / 2 - 15,
-        y: platform.y - 30,
+        x: platform.x + platform.width / 2 - 15, // Center on platform
+        y: platform.y - 40, // Raise higher above platform
         width: 30,
         height: 30,
         collected: false,
-        type: 'invincibility'
+        type: 'invincibility',
+        rotation: 0 // Add rotation property
     };
 }
 
