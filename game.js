@@ -1218,6 +1218,21 @@ function gameLoop() {
     }
     
     // Draw meteors
+    // Check for powerup collection
+    powerups.forEach(powerup => {
+        if (!powerup.collected &&
+            player.x < powerup.x + powerup.width &&
+            player.x + player.width > powerup.x &&
+            player.y < powerup.y + powerup.height &&
+            player.y + player.height > powerup.y) {
+            powerup.collected = true;
+            if (powerup.type === 'invincibility') {
+                player.isInvincible = true;
+                player.invincibilityTimer = 0;
+            }
+        }
+    });
+
     meteors.forEach(meteor => drawMeteor(meteor));
     
     addTouchControls();
