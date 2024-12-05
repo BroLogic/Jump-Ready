@@ -616,8 +616,8 @@ function update() {
         }
     }
 
-    // Spawn meteors based on score
-    if (score > 2000 && Math.random() < 0.002 + (score / 100000)) {
+    // Spawn meteors based on score, but much less frequently
+    if (score > 5000 && Math.random() < 0.0005 + (score / 500000)) {
         meteors.push(createMeteor());
     }
 
