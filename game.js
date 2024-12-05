@@ -538,7 +538,7 @@ function createMeteor() {
 
 function update() {
     // Spawn meteors based on score
-    if (score > 1000 && Math.random() < 0.005 + (score / 40000)) {
+    if (score > 2000 && Math.random() < 0.002 + (score / 100000)) {
         meteors.push(createMeteor());
     }
 
