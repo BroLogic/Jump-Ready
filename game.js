@@ -175,7 +175,7 @@ function generatePlatform(y, isStarting = false) {
             else platformType = 'bouncy';
         } else {
             const rand = Math.random();
-            if (rand < 0.25) platformType = 'bouncy';
+            if (rand < 0.15) platformType = 'bouncy';
         }
     }
     
@@ -538,7 +538,7 @@ function createMeteor() {
 
 function update() {
     // Spawn meteors based on score
-    if (score > 1000 && Math.random() < 0.01 + (score / 20000)) {
+    if (score > 1000 && Math.random() < 0.005 + (score / 40000)) {
         meteors.push(createMeteor());
     }
 
